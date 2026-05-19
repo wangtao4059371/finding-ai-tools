@@ -105,7 +105,7 @@ export default function Home({ tools }) {
         <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              Finding AI Tools
+              {locale === 'zh' ? 'AI 工具导航' : 'Finding AI Tools'}
             </h1>
             <button
               onClick={toggleDarkMode}
