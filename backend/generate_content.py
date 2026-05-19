@@ -1,7 +1,8 @@
 import os
-import json
 import time
 import sqlite3
+import re
+import requests
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -12,13 +13,46 @@ if not API_KEY:
 
 client = OpenAI(api_key=API_KEY, base_url="https://api.deepseek.com/v1")
 
-def generate_content(name, description, tag, url):
-    prompt = f"""你是一个专业的 AI 科技编辑。请为以下 AI 工具写一份简洁的介绍。用中文输出，总共控制在 200-300 字。
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+}
 
-工具名称: {name}
+def fetch_website_text(url):
+    """尝试抓取官网首页文本"""
+    if not url:
+        return None
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=10)
+        r.raise_for_status()
+        text = re.sub(r'<script[^>]*>.*?</script>', '', r.text, flags=re.DOTALL)
+        text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL)
+        text = re.sub(r'<[^>]+>', ' ', text)
+        text = re.sub(r'\s+', ' ', text)
+        text = text.strip()[:3000]
+        return text
+    except:
+        return None
+
+def generate_content(name, description, tag, url):
+    # 先获取官网最新内容
+    site_text = fetch_website_text(url)
+    
+    context = f"""工具名称: {name}
 简短描述: {description}
 分类: {tag}
-官网: {url}
+官网: {url}"""
+
+    if site_text:
+        context += f"""
+以下是从官网抓取的最新内容（请以此为准）：
+---
+{site_text}
+---"""
+
+    prompt = f"""你是一个专业的 AI 科技编辑。请根据以下信息为这个 AI 工具写一份简洁介绍。用中文输出，总共控制在 200-300 字。
+如果提供了官网最新内容，请优先使用官网信息。
+
+{context}
 
 请按以下结构输出 HTML 格式的内容（只输出 body 内的 HTML）：
 
@@ -47,11 +81,10 @@ def generate_content(name, description, tag, url):
                 {"role": "system", "content": "你是一个只输出 HTML 内容的机器。"},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.5,
+            temperature=0.3,
             timeout=60
         )
         content = response.choices[0].message.content.strip()
-        # 清理可能的 markdown 包裹
         if content.startswith("```html"):
             content = content.replace("```html", "").replace("```", "").strip()
         elif content.startswith("```"):
@@ -65,8 +98,7 @@ def main():
     conn = sqlite3.connect('tools.db')
     cursor = conn.cursor()
     
-    # 获取没有 content 的工具
-    cursor.execute("SELECT id, name, description, tag, url, slug FROM tools WHERE content IS NULL OR content = '' ORDER BY id")
+    cursor.execute("SELECT id, name, description, tag, url, slug FROM tools WHERE slug IS NOT NULL AND slug != '' AND (content IS NULL OR content = '') ORDER BY id")
     tools = cursor.fetchall()
     
     print(f"需要生成内容的工具: {len(tools)} 个\n")
@@ -75,12 +107,13 @@ def main():
     for tool in tools:
         tool_id, name, description, tag, url, slug = tool
         
-        # 跳过中文名没有 slug 的
-        if not slug:
-            print(f"  跳过 (无slug): {name}")
-            continue
-        
         print(f"生成 ({count+1}/{len(tools)}): {name} ...")
+        
+        # 尝试抓取官网
+        site_text = fetch_website_text(url)
+        source_tag = "🌐 官网" if site_text else "📚 知识库"
+        print(f"  数据源: {source_tag}")
+        
         content = generate_content(name, description or '', tag or '', url or '')
         
         if content:
@@ -91,8 +124,7 @@ def main():
         else:
             print(f"  ❌ 失败")
         
-        # 避免限速
-        if count % 5 == 0:
+        if count % 3 == 0:
             time.sleep(2)
         else:
             time.sleep(0.5)

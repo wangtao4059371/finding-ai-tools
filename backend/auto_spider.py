@@ -287,28 +287,38 @@ def fetch_all_ai_tools() -> List[str]:
 
 
 def generate_detail_content(name: str, description: str, tag: str, url: str) -> Optional[str]:
-    prompt = f"""你是一个专业的 AI 科技编辑。请为以下 AI 工具写一份简洁的介绍。用中文输出，总共控制在 200-300 字。
-
-工具名称: {name}
+    # 尝试抓取官网最新内容
+    site_text = None
+    if url:
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            r.raise_for_status()
+            text = re.sub(r'<script[^>]*>.*?</script>', '', r.text, flags=re.DOTALL)
+            text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL)
+            text = re.sub(r'<[^>]+>', ' ', text)
+            text = re.sub(r'\s+', ' ', text)
+            site_text = text.strip()[:3000]
+        except:
+            pass
+    
+    context = f"""工具名称: {name}
 简短描述: {description}
 分类: {tag}
-官网: {url}
+官网: {url}"""
 
-按以下结构输出 HTML（只要 HTML，不加解释）：
+    if site_text:
+        context += f"\n\n以下是从官网抓取的最新内容（请优先以官网信息为准）：\n{site_text}"
 
-<h2>概述</h2>
-<p>说明该工具是什么、谁开发的、主要用途</p>
+    prompt = f"""你是一个专业的 AI 科技编辑。请根据以下信息写一份简洁中文介绍，总共 200-300 字。
+如果提供了官网最新内容，请优先使用官网信息。
 
-<h2>核心特点</h2>
-<ul>
-<li>特点（一句话）</li>
-</ul>
+{context}
 
-<h2>适用场景</h2>
-<p>适合什么人用</p>
-
-<h2>价格</h2>
-<p>收费模式</p>"""
+按此结构输出 HTML（只要 HTML）：
+<h2>概述</h2><p>说明该工具是什么、谁开发的、主要用途</p>
+<h2>核心特点</h2><ul><li>特点</li></ul>
+<h2>适用场景</h2><p>适合什么人用</p>
+<h2>价格</h2><p>收费模式</p>"""
     
     try:
         response = client.chat.completions.create(
