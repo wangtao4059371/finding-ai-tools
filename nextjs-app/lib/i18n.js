@@ -15,7 +15,7 @@ const translations = {
     type: '类型',
     baseModel: '基座',
     framework: '框架',
-    backToList: '← 返回列表',
+    backToList: '返回列表',
     toolNotFound: '工具未找到',
   },
   en: {
@@ -34,7 +34,7 @@ const translations = {
     type: 'Type',
     baseModel: 'Base',
     framework: 'Framework',
-    backToList: '← Back to List',
+    backToList: 'Back to List',
     toolNotFound: 'Tool Not Found',
   },
 };
