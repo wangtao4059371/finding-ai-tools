@@ -33,7 +33,7 @@ export default function PrivacyPolicy() {
           <p>We may update this privacy policy from time to time. Changes will be posted on this page with an updated revision date.</p>
           
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">7. Contact</h2>
-          <p>If you have any questions about this privacy policy, please contact us at <a href="mailto:contact@findingaitools.com" className="text-indigo-600 hover:underline">contact@findingaitools.com</a>.</p>
+          <p>If you have any questions about this privacy policy, please contact us at <a href="mailto:wangtao4059371@gmail.com" className="text-indigo-600 hover:underline">wangtao4059371@gmail.com</a>.</p>
         </div>
       </main>
     </div>

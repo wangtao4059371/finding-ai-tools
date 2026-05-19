@@ -35,7 +35,7 @@ export default function Terms() {
           <p>We reserve the right to modify these terms at any time. Continued use of the website after changes constitutes acceptance of the new terms.</p>
           
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">8. Contact</h2>
-          <p>For questions about these terms, contact <a href="mailto:contact@findingaitools.com" className="text-indigo-600 hover:underline">contact@findingaitools.com</a>.</p>
+          <p>For questions about these terms, contact <a href="mailto:wangtao4059371@gmail.com" className="text-indigo-600 hover:underline">wangtao4059371@gmail.com</a>.</p>
         </div>
       </main>
     </div>
