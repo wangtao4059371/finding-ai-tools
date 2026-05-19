@@ -32,23 +32,23 @@ export default function Nav() {
             Finding AI Tools
           </Link>
           <nav className="flex gap-1">
-            <Link
-              href="/"
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                router.pathname === '/'
-                  ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+              <Link
+                href="/"
+                className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
+                  router.pathname === '/'
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
             >
               {locale === 'zh' ? 'AI评分' : 'AI Ratings'}
             </Link>
-            <Link
-              href="/tools"
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                router.pathname === '/tools' || router.pathname.startsWith('/tool/')
-                  ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+              <Link
+                href="/tools"
+                className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
+                  router.pathname === '/tools' || router.pathname.startsWith('/tool/')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
             >
               {locale === 'zh' ? 'AI工具' : 'AI Tools'}
             </Link>

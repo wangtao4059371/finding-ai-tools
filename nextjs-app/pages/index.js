@@ -24,6 +24,21 @@ const MODELS = [
   {nm:"Kimi K2.6",co:"月之暗面（中国）",pr:"API按Token计费",ur:"https://kimi.moonshot.cn",de:"超长文本无损处理独树一帜。代码编写和Agent群体智能重大升级，可处理庞大代码库或几百页PDF精准提取信息。",re:8.9,ch:9.3,coding:8.6,ma:8.2,ha:8.6,sp:8,ap:8.8,ag:9,lt:9.7},
   {nm:"Llama 4 Scout/Maverick",co:"Meta（美国）",pr:"完全开源免费",ur:"https://llama.meta.com",de:"128专家架构+10M极限上下文，消费级节点跑出惊人效果，独立部署最强开源底座。",re:9,ch:7.8,coding:8.5,ma:8.8,ha:8,sp:9,ap:9.5,ag:8.2,lt:9.8},
   {nm:"Mistral Large 3",co:"Mistral AI（法国）",pr:"API按量计费",ur:"https://mistral.ai",de:"欧洲AI领头羊，小参数高智能。逻辑推理和多语言商务写作不输顶级闭源模型。",re:8.8,ch:7.5,coding:9,ma:8.5,ha:8.3,sp:9.2,ap:8,ag:8.5,lt:8},
+  {nm:"Command R7+",co:"Cohere（加拿大）",pr:"API按量计费",ur:"https://cohere.com",de:"企业级RAG和多语言商务协作定制黑马模型。跨国供应链文档解析和企业合规审查稳定性极强。",re:8.2,ch:7.2,coding:7.8,ma:7.5,ha:8.8,sp:8.3,ap:7.2,ag:9,lt:8.5},
+  {nm:"GLM-5.1",co:"智谱AI（中国）",pr:"API按量计费,企业定制",ur:"https://www.zhipuai.cn",de:"深厚学术积累，逻辑推理和全链路Agent流程管理表现出色，全模态能力可自动生成数据可视化。",re:8.8,ch:9.2,coding:8.4,ma:8.5,ha:8.9,sp:8.6,ap:8.2,ag:8.7,lt:8.7},
+  {nm:"Doubao Seed 2.0",co:"字节跳动（中国）",pr:"API超低定价",ur:"https://www.volcengine.com",de:"击穿行业性价比和超高并发支持，语义理解流畅细腻，语音合成技术国内领先。",re:8.7,ch:9.4,coding:8,ma:8,ha:8.4,sp:9.3,ap:9.2,ag:8.5,lt:8.2},
+  {nm:"HunYuan 3.5（混元）",co:"腾讯（中国）",pr:"API按量计费,腾讯云生态",ur:"https://cloud.tencent.com",de:"生图文生视频多模态及微信QQ生态全方位迭代，加强了长文本上下文检索与多轮对话连贯性。",re:8.5,ch:9.1,coding:8.2,ma:8.1,ha:8.3,sp:8.4,ap:8,ag:8.3,lt:8.4},
+  {nm:"SenseChat V6（商量）",co:"商汤科技（中国）",pr:"API按量计费,一体机部署",ur:"https://www.sensetime.com",de:"CV领域硬核底蕴，多模态图文解析和医疗/工业视觉图表理解专业度极高。",re:8.3,ch:9,coding:8.1,ma:8,ha:8.6,sp:8.2,ap:7,ag:8.4,lt:8},
+  {nm:"Yi 3.5",co:"零一万物（中国）",pr:"API计费,部分开源",ur:"https://www.01.ai",de:"LMSYS榜单一再逆袭，惊人性价比与推理速度。中英文双语翻译和跨境电商文案生成优势明显。",re:8.6,ch:9,coding:8.3,ma:8,ha:8.2,sp:9.1,ap:8.7,ag:8.1,lt:8.6},
+  {nm:"Baichuan 4-Turbo",co:"百川智能（中国）",pr:"API计费,企业定制",ur:"https://www.baichuan-ai.com",de:"长文本检索无损精准度及医疗等领域深度垂直微调。RAG技术解决专业问题胡言乱语。",re:8.4,ch:9,coding:7.9,ma:7.8,ha:8.7,sp:8.5,ap:7.8,ag:8,lt:8.9},
+  {nm:"TeleChat 2（天翼）",co:"中国电信（中国）",pr:"API计费,政企专网",ur:"https://www.chinatelecom.com.cn",de:"运营商背景大模型。政务公文写作、政策法规解读和客服话术生成等场景合规准确率极高。",re:8,ch:9.1,coding:7.5,ma:7.6,ha:8.8,sp:8.3,ap:7.5,ag:7.8,lt:8},
+  {nm:"MiniMax ABAB 6.5",co:"MiniMax（中国）",pr:"API按量计费,海螺¥25/月",ur:"https://www.minimax.io",de:"泛娱乐与角色扮演领域王者。细腻情商与人设维持能力，多模态语音合成方言情绪化表达极出色。",re:8.2,ch:9.3,coding:7.8,ma:7.7,ha:8.1,sp:8.9,ap:8.6,ag:8.2,lt:8.3},
+  {nm:"Phi-4 / Phi-4 Mini",co:"微软（美国）",pr:"开源免费,Azure托管",ur:"https://azure.microsoft.com",de:"端侧小模型天花板，小参数高智能。可部署在笔记本、手机甚至边缘设备，速度极快。",re:7.8,ch:7,coding:7.5,ma:7.2,ha:7.8,sp:9.5,ap:9.8,ag:7,lt:6.5},
+  {nm:"Gemma 2.5",co:"Google（美国）",pr:"开源免费,允许商用",ur:"https://ai.google.dev",de:"谷歌开源阵营主力军。数学逻辑和纯文本推导扎实可靠，算法研究的优质白盒底座。",re:7.5,ch:6.8,coding:7,ma:7.8,ha:8.2,sp:9,ap:9.5,ag:7.2,lt:7},
+  {nm:"Stable Diff 3.5",co:"Stability AI（英国）",pr:"开源免费,API按次",ur:"https://stability.ai",de:"全球开源绘图生态统治者。多主体排版和空间透视逻辑质的飞跃，开发者开发了数万控制插件。",re:6.5,ch:6,coding:2.5,ma:1.5,ha:7.5,sp:8,ap:9.5,ag:3.5,lt:2.5},
+  {nm:"Flux.1 Pro",co:"Black Forest Labs（德国）",pr:"Pro API计费,Dev开源",ur:"https://blackforestlabs.ai",de:"SD原班人马创立。画质上限和超长提示词理解力惊人，复杂多人场景真实质感表现硬核。",re:7.5,ch:6.8,coding:2,ma:1.8,ha:8.8,sp:7,ap:6,ag:3,lt:3.5},
+  {nm:"Sora 2.0 Pro",co:"OpenAI（美国）",pr:"定向API,影视订阅",ur:"https://openai.com/sora",de:"物理级视频模拟器。修复物理因果律漏洞，60秒长视频，3D空间流体光线折射多镜头运动一致性。",re:8.5,ch:7,coding:3.5,ma:3,ha:8,sp:4,ap:2,ag:5,lt:4},
+  {nm:"Kling 2.0（可灵）",co:"快手（中国）",pr:"算力点卡,官方API",ur:"https://kling.kuaishou.com",de:"国内文生视频领域领跑者。运镜平滑度和肢体协调性极高，适合搭建短视频自动化剪辑流水线。",re:8,ch:8.5,coding:3,ma:2.5,ha:7.8,sp:7.5,ap:7,ag:4.5,lt:3},
 ];
 
 function dim(m,k){return k==='reasoning'?m.re:k==='chinese'?m.ch:k==='coding'?m.coding:k==='math'?m.ma:k==='hallucination'?m.ha:k==='speed'?m.sp:k==='api_cost'?m.ap:k==='agent'?m.ag:k==='long_text'?m.lt:0}
@@ -73,7 +88,7 @@ export default function Home() {
       </Head>
       <Nav />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-full mx-auto px-6 py-4">
           <div className="text-center mb-2">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AI 大模型多维评分体系</h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">9维度 · {MODELS.length}款主流模型工程化评测 · 支持1v1深度对比</p>
