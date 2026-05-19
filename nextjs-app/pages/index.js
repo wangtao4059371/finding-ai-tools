@@ -178,29 +178,29 @@ export default function Home({ tools }) {
         <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 py-8 mt-8">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Finding AI Tools</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale === 'zh' ? '关于我们' : 'About'}</h4>
               <ul className="space-y-1">
-                <li><a href="/about" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">About</a></li>
-                <li><a href="/contact" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Contact</a></li>
+                <li><a href="/about" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? '关于' : 'About'}</a></li>
+                <li><a href="/contact" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? '联系我们' : 'Contact'}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Legal</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale === 'zh' ? '法律条款' : 'Legal'}</h4>
               <ul className="space-y-1">
-                <li><a href="/privacy-policy" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Privacy Policy</a></li>
-                <li><a href="/terms" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Terms</a></li>
+                <li><a href="/privacy-policy" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? '隐私政策' : 'Privacy Policy'}</a></li>
+                <li><a href="/terms" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? '服务条款' : 'Terms'}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Categories</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale === 'zh' ? '分类' : 'Categories'}</h4>
               <ul className="space-y-1">
-                <li><a href="/?tag=大模型AI" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">AI Models</a></li>
-                <li><a href="/?tag=AI音频/音乐" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">AI Music</a></li>
-                <li><a href="/?tag=AI学习资源" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Learning</a></li>
+                <li><a href="/?tag=大模型AI" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? '大模型AI' : 'AI Models'}</a></li>
+                <li><a href="/?tag=AI音频/音乐" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? 'AI音频/音乐' : 'AI Music'}</a></li>
+                <li><a href="/?tag=AI学习资源" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? 'AI学习资源' : 'Learning'}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Tools</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale === 'zh' ? '热门工具' : 'Popular'}</h4>
               <ul className="space-y-1">
                 <li><a href="/tool/chatgpt" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">ChatGPT</a></li>
                 <li><a href="/tool/claude" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Claude</a></li>
