@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { getAllTools } from '../lib/api';
 import { getLocale, t } from '../lib/i18n';
@@ -138,10 +138,6 @@ export default function Home({ tools }) {
               <div className="text-center">
                 <div className="text-3xl font-bold">{categoryCount}+</div>
                 <div className="text-indigo-200 text-sm">{locale === 'zh' ? '分类' : 'Categories'}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold">260+</div>
-                <div className="text-indigo-200 text-sm">{locale === 'zh' ? '详细文章' : 'Articles'}</div>
               </div>
             </div>
           </div>
