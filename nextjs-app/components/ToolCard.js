@@ -6,7 +6,7 @@ export default function ToolCard({ tool }) {
   const locale = getLocale();
   
   return (
-    <Link href={`/tool/${tool.id}`}>
+    <Link href={`/tool/${tool.slug || tool.id}`}>
       <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer h-full flex flex-col justify-between relative overflow-hidden group">
         <div className={`absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-lg ${tool.type === 'Agent' ? 'bg-purple-600' : 'bg-blue-500'} text-white`}>
           {tool.type.toUpperCase()}

@@ -175,8 +175,41 @@ export default function Home({ tools }) {
           </section>
         </main>
 
-        <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 py-6 mt-8">
-          <div className="max-w-7xl mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+        <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 py-8 mt-8">
+          <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Finding AI Tools</h4>
+              <ul className="space-y-1">
+                <li><a href="/about" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">About</a></li>
+                <li><a href="/contact" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Legal</h4>
+              <ul className="space-y-1">
+                <li><a href="/privacy-policy" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Privacy Policy</a></li>
+                <li><a href="/terms" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Terms</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Categories</h4>
+              <ul className="space-y-1">
+                <li><a href="/?tag=大模型AI" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">AI Models</a></li>
+                <li><a href="/?tag=AI音频/音乐" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">AI Music</a></li>
+                <li><a href="/?tag=AI学习资源" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Learning</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Tools</h4>
+              <ul className="space-y-1">
+                <li><a href="/tool/chatgpt" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">ChatGPT</a></li>
+                <li><a href="/tool/claude" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Claude</a></li>
+                <li><a href="/tool/gemini" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Gemini</a></li>
+                <li><a href="/tool/deepseek" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">DeepSeek</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto px-4 mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 text-xs">
             {t('footer')}
           </div>
         </footer>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
-import { getAllTools, getToolById } from '../../lib/api';
+import { getAllTools, getToolBySlug } from '../../lib/api';
 
 export default function ToolDetail({ tool }) {
   if (!tool) {
@@ -17,7 +17,7 @@ export default function ToolDetail({ tool }) {
     '@type': 'SoftwareApplication',
     name: tool.name,
     description: tool.description,
-    url: `https://findingaitools.com/tool/${tool.id}`,
+    url: `https://findingaitools.com/tool/${tool.slug}`,
     applicationCategory: tool.tag,
     operatingSystem: 'Web',
     offers: {
@@ -34,7 +34,9 @@ export default function ToolDetail({ tool }) {
         <meta name="description" content={tool.description} />
         <meta property="og:title" content={`${tool.name} - Finding AI Tools`} />
         <meta property="og:description" content={tool.description} />
-        <meta property="og:url" content={`https://findingaitools.com/tool/${tool.id}`} />
+        <meta property="og:url" content={`https://findingaitools.com/tool/${tool.slug}`} />
+        <meta property="og:type" content="article" />
+        <link rel="canonical" href={`https://findingaitools.com/tool/${tool.slug}`} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </Head>
 
@@ -108,15 +110,15 @@ export default function ToolDetail({ tool }) {
 
 export async function getStaticPaths() {
   const tools = await getAllTools();
-  const paths = tools.map(tool => ({
-    params: { id: tool.id.toString() },
-  }));
+  const paths = tools
+    .filter(t => t.slug)
+    .map(tool => ({ params: { slug: tool.slug } }));
   return { paths, fallback: 'blocking' };
 }
 
 export async function getStaticProps({ params }) {
   try {
-    const tool = await getToolById(params.id);
+    const tool = await getToolBySlug(params.slug);
     return { props: { tool }, revalidate: 60 };
   } catch (error) {
     return { notFound: true };

@@ -6,8 +6,8 @@ export async function getAllTools() {
   return res.json();
 }
 
-export async function getToolById(id) {
-  const res = await fetch(`${API_BASE}/api/tools/${id}`);
-  if (!res.ok) throw new Error(`Tool ${id} not found`);
+export async function getToolBySlug(slug) {
+  const res = await fetch(`${API_BASE}/api/tools/${slug}`);
+  if (!res.ok) throw new Error(`Tool ${slug} not found`);
   return res.json();
 }
