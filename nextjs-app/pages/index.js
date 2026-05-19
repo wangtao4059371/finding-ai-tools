@@ -75,108 +75,111 @@ export default function Home() {
 
   const tags = DIMS.map(d=>{
     const v=dim(m,d.k);
-    if(v>=9) return {cls:'bg-green-100 text-green-700',icon:'🏆',v};
-    if(v<=5) return {cls:'bg-red-100 text-red-700',icon:'⚠️',v};
-    return {cls:'bg-gray-100 text-gray-600',icon:'',v};
+    if(v>=9) return {cls:'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',icon:'🏆',v};
+    if(v<=5) return {cls:'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',icon:'⚠️',v};
+    return {cls:'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',icon:'',v};
   });
 
   return (
     <>
       <Head>
         <title>AI 大模型多维评分 - Finding AI Tools</title>
-        <meta name="description" content="9维度 x 26款主流AI大模型工程化评测对比，支持1v1深入对比。推理/编程/中文/数学/Agent能力一图看透。" />
+        <meta name="description" content="9维度 x 26款主流AI大模型工程化评测对比，支持1v1深入对比" />
       </Head>
       <Nav />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-full mx-auto px-6 py-4">
-          <div className="text-center mb-2">
+        <div className="max-w-[1400px] mx-auto px-5 py-5">
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AI 大模型多维评分体系</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">9维度 · {MODELS.length}款主流模型工程化评测 · 支持1v1深度对比</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">9 维度 × {MODELS.length} 款模型工程化评测 · 点击左侧切换模型 · 下拉选第二模型进行 1v1 对比</p>
           </div>
 
-          <div className="flex justify-center items-center gap-2 mb-4 text-sm">
-            <span className="text-gray-500">当前: <strong className="text-indigo-600">{m.nm}</strong></span>
-            <span className="text-gray-400">VS</span>
+          <div className="flex justify-center items-center gap-3 mb-5 text-sm flex-wrap">
+            <span className="text-gray-500">当前: <strong className="text-indigo-600 dark:text-indigo-400">{m.nm}</strong></span>
+            <span className="text-gray-400 font-semibold">VS</span>
             <select
               value={compareIdx}
               onChange={e=>{const v=parseInt(e.target.value);setCompareIdx(v>=0&&v===mainIdx?-1:v)}}
-              className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm"
+              className="px-3 py-1.5 border-2 border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:border-indigo-500 outline-none"
             >
               <option value="-1">-- 选择对比模型 --</option>
               {MODELS.map((mod,i) => i!==mainIdx ? <option key={i} value={i}>{mod.nm}</option> : null)}
             </select>
             {compareIdx >= 0 && (
-              <span className="bg-indigo-50 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 px-2 py-1 rounded text-xs cursor-pointer" onClick={()=>setCompareIdx(-1)}>
-                VS {MODELS[compareIdx].nm} · ✕
+              <span className="bg-indigo-50 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded text-xs cursor-pointer font-medium" onClick={()=>setCompareIdx(-1)}>
+                VS {MODELS[compareIdx].nm} · ✕ 取消
               </span>
             )}
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex gap-5 items-start">
             {/* Left: Model List */}
-            <div className="lg:w-60 flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 max-h-[500px] overflow-y-auto">
-              <div className="px-4 py-3 text-xs font-bold text-gray-400 uppercase border-b sticky top-0 bg-white dark:bg-gray-800 z-10">全部模型 ({MODELS.length})</div>
+            <div className="w-[260px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[550px] overflow-y-auto">
+              <div className="px-4 py-3 text-xs font-bold text-gray-400 uppercase border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">全部模型 ({MODELS.length})</div>
               {MODELS.map((mod,i)=>(
                 <div
                   key={i}
                   onClick={()=>{setMainIdx(i);setCompareIdx(-1)}}
-                  className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer text-sm border-b border-gray-50 dark:border-gray-700 transition-colors ${i===mainIdx?'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold border-l-3 border-l-indigo-600':'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
+                  className={`flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm border-b border-gray-50 dark:border-gray-700 transition-colors ${
+                    i===mainIdx
+                      ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold border-l-[3px] border-l-indigo-600 pl-[13px]'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                 >
-                  <img src={fav(mod.ur)} className="w-5 h-5 rounded" alt="" onError={e=>e.target.style.display='none'} />
+                  <img src={fav(mod.ur)} className="w-[18px] h-[18px] rounded flex-shrink-0" alt="" onError={e=>e.target.style.display='none'} />
                   <span className="truncate flex-1">{mod.nm}</span>
-                  <span className="text-xs text-gray-400 ml-auto">{avg(mod)}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">{avg(mod)}</span>
                 </div>
               ))}
             </div>
 
             {/* Center: Chart */}
-            <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
-              <div className="text-center font-bold text-lg mb-2 text-gray-900 dark:text-gray-100">
+            <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+              <div className="text-center font-bold text-lg mb-3 text-gray-900 dark:text-gray-100">
                 {isCmp ? `${models[0].nm}  VS  ${models[1].nm}` : models[0].nm}
               </div>
-              <div className="max-w-lg mx-auto">
+              <div className="max-w-[480px] mx-auto">
                 <Radar data={chartData} options={{
                   responsive:true,
-                  scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:11}},pointLabels:{font:{size:11}}}},
-                  plugins:{legend:{display:isCmp,position:'bottom'}}
+                  scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:12}},pointLabels:{font:{size:12,font:{weight:'bold'}}}}},
+                  plugins:{legend:{display:isCmp,position:'bottom',labels:{font:{size:13},padding:20}}}
                 }} />
               </div>
-              <div className="flex flex-wrap gap-1.5 mt-3 justify-center">
+              <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                 {tags.map((t,i)=>(
-                  <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-medium ${t.cls}`}>{t.icon} {DIMS[i].l} {t.v}</span>
+                  <span key={i} className={`px-2.5 py-1 rounded-full text-xs font-semibold ${t.cls}`}>{t.icon} {DIMS[i].l} {t.v}</span>
                 ))}
               </div>
             </div>
 
             {/* Right: Info */}
-            <div className="lg:w-72 flex-shrink-0">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+            <div className="w-[300px] flex-shrink-0">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                 {isCmp ? (
                   <div>
-                    <div className="font-bold text-sm text-indigo-600 mb-3">对比详情</div>
-                    <table className="w-full text-xs">
-                      <thead><tr className="text-gray-500"><th className="text-left pb-2">维度</th><th className="text-right pb-2">{models[0].nm.split(' ')[0]}</th><th className="text-right pb-2">{models[1].nm.split(' ')[0]}</th></tr></thead>
+                    <div className="font-bold text-base text-indigo-600 dark:text-indigo-400 mb-3">对比详情</div>
+                    <table className="w-full text-sm">
+                      <thead><tr className="text-gray-400 text-xs"><th className="text-left pb-2">维度</th><th className="text-right pb-2">{models[0].nm.split(' ')[0]}</th><th className="text-right pb-2">{models[1].nm.split(' ')[0]}</th></tr></thead>
                       <tbody>
                         {DIMS.map(d=>{
                           const va=dim(models[0],d.k), vb=dim(models[1],d.k);
-                          return <tr key={d.k} className="border-t border-gray-100 dark:border-gray-700"><td className="py-1.5 text-gray-500">{d.l}</td><td className={`text-right py-1.5 font-medium ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va}</td><td className={`text-right py-1.5 font-medium ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb}</td></tr>;
+                          return <tr key={d.k} className="border-t border-gray-50 dark:border-gray-700"><td className="py-2 text-gray-500">{d.l}</td><td className={`text-right py-2 font-semibold ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va}</td><td className={`text-right py-2 font-semibold ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb}</td></tr>;
                         })}
-                        <tr className="border-t-2 border-gray-200 dark:border-gray-600 font-bold"><td className="py-1.5">综合</td><td className={`text-right py-1.5 ${+avg(models[0])>+avg(models[1])?'text-red-600':'text-green-600'}`}>{avg(models[0])}</td><td className={`text-right py-1.5 ${+avg(models[1])>+avg(models[0])?'text-red-600':'text-green-600'}`}>{avg(models[1])}</td></tr>
+                        <tr className="border-t-2 border-gray-200 dark:border-gray-600 font-extrabold"><td className="py-2">综合</td><td className={`text-right py-2 ${+avg(models[0])>+avg(models[1])?'text-red-600':'text-green-600'}`}>{avg(models[0])}</td><td className={`text-right py-2 ${+avg(models[1])>+avg(models[0])?'text-red-600':'text-green-600'}`}>{avg(models[1])}</td></tr>
                       </tbody>
                     </table>
                   </div>
                 ) : (
                   <div>
                     <div className="text-center">
-                      <div className="text-4xl font-extrabold text-indigo-600">{avg(m)}</div>
+                      <div className="text-[46px] font-extrabold text-indigo-600 leading-none">{avg(m)}</div>
                       <div className="text-xs text-gray-400 mt-1">综合评分 / 10</div>
-                      <div className="h-1 bg-gray-100 rounded-full mt-2 overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{width:(+avg(m)*10)+'%'}} />
+                      <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full mt-3 mb-3 overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500" style={{width:(+avg(m)*10)+'%'}} />
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-3 mb-2"><strong>{m.co}</strong> · {m.pr}</div>
-                    <div className="text-xs text-gray-600 leading-relaxed bg-gray-50 dark:bg-gray-750 rounded-lg p-3 mb-3">{m.de}</div>
-                    <a href={m.ur} target="_blank" className="block w-full text-center py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                    <div className="text-xs text-gray-500 mt-3 mb-2"><strong className="text-gray-700 dark:text-gray-300">{m.co}</strong> · {m.pr}</div>
+                    <div className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-750 rounded-lg p-3.5 mb-4">{m.de}</div>
+                    <a href={m.ur} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">
                       🌐 {locale==='zh'?'访问官网':'Visit Website'}
                     </a>
                   </div>
@@ -187,7 +190,7 @@ export default function Home() {
         </div>
 
         <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 py-8 mt-8">
-          <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+          <div className="max-w-[1400px] mx-auto px-5 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale==='zh'?'关于我们':'About'}</h4>
               <ul className="space-y-1">
