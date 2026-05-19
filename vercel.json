@@ -2,13 +2,5 @@
   "buildCommand": "cd nextjs-app && npm install && npm run build",
   "outputDirectory": "nextjs-app/.next",
   "framework": "nextjs",
-  "installCommand": "cd nextjs-app && npm install",
-  "functions": {
-    "main.py": {
-      "runtime": null
-    },
-    "auto_spider.py": {
-      "runtime": null
-    }
-  }
+  "installCommand": "cd nextjs-app && npm install"
 }
