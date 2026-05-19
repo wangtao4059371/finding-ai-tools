@@ -13,53 +13,30 @@ if not API_KEY:
 client = OpenAI(api_key=API_KEY, base_url="https://api.deepseek.com/v1")
 
 def generate_content(name, description, tag, url):
-    prompt = f"""你是一个专业的 AI 科技编辑。请为以下 AI 工具写一份详细的介绍文章。用中文输出，不少于 400 字。
+    prompt = f"""你是一个专业的 AI 科技编辑。请为以下 AI 工具写一份简洁的介绍。用中文输出，总共控制在 200-300 字。
 
 工具名称: {name}
 简短描述: {description}
 分类: {tag}
 官网: {url}
 
-请按以下结构输出 HTML 格式的内容（只输出 body 内的 HTML，不要 doctype 和 body 标签）：
+请按以下结构输出 HTML 格式的内容（只输出 body 内的 HTML）：
 
 <h2>概述</h2>
-<p>（2-3 段介绍这个工具是什么，谁开发的，主要能力）</p>
+<p>（1 段话，说明该工具是什么、谁开发的、主要用途）</p>
 
-<h2>核心功能</h2>
+<h2>核心特点</h2>
 <ul>
-<li>功能1</li>
-<li>功能2</li>
-<li>功能3</li>
-<li>功能4</li>
-<li>功能5</li>
+<li>特点1（一句话）</li>
+<li>特点2（一句话）</li>
+<li>特点3（一句话）</li>
 </ul>
 
 <h2>适用场景</h2>
-<p>（描述这个工具适合哪些人使用，解决什么问题）</p>
-<ul>
-<li>场景1</li>
-<li>场景2</li>
-<li>场景3</li>
-</ul>
+<p>（1 句话说明适合什么人用、解决什么问题）</p>
 
-<h2>优缺点</h2>
-<h3>优点</h3>
-<ul>
-<li>优点1</li>
-<li>优点2</li>
-<li>优点3</li>
-</ul>
-<h3>缺点</h3>
-<ul>
-<li>缺点1</li>
-<li>缺点2</li>
-</ul>
-
-<h2>常见问题 (FAQ)</h2>
-<h3>Q: （问题1）</h3>
-<p>A: （回答）</p>
-<h3>Q: （问题2）</h3>
-<p>A: （回答）</p>
+<h2>价格</h2>
+<p>（1 句话说明收费模式）</p>
 
 直接输出 HTML，不要加任何解释。"""
     

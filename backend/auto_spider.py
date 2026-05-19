@@ -287,33 +287,28 @@ def fetch_all_ai_tools() -> List[str]:
 
 
 def generate_detail_content(name: str, description: str, tag: str, url: str) -> Optional[str]:
-    prompt = f"""你是一个专业的 AI 科技编辑。请为以下 AI 工具写详细的中文介绍。不少于 400 字。
+    prompt = f"""你是一个专业的 AI 科技编辑。请为以下 AI 工具写一份简洁的介绍。用中文输出，总共控制在 200-300 字。
 
 工具名称: {name}
 简短描述: {description}
 分类: {tag}
 官网: {url}
 
-按以下结构输出 HTML（只要 body 内的 HTML，不加任何解释）：
+按以下结构输出 HTML（只要 HTML，不加解释）：
 
 <h2>概述</h2>
-<p>介绍这个工具的用途、特点和优势</p>
+<p>说明该工具是什么、谁开发的、主要用途</p>
 
-<h2>核心功能</h2>
+<h2>核心特点</h2>
 <ul>
-<li>功能</li>
+<li>特点（一句话）</li>
 </ul>
 
 <h2>适用场景</h2>
-<p>场景说明</p>
+<p>适合什么人用</p>
 
-<h2>优缺点</h2>
-<h3>优点</h3><ul><li></li></ul>
-<h3>缺点</h3><ul><li></li></ul>
-
-<h2>常见问题</h2>
-<h3>Q: </h3><p>A: </p>
-<h3>Q: </h3><p>A: </p>"""
+<h2>价格</h2>
+<p>收费模式</p>"""
     
     try:
         response = client.chat.completions.create(
@@ -322,7 +317,7 @@ def generate_detail_content(name: str, description: str, tag: str, url: str) -> 
                 {"role": "system", "content": "你是一个只输出 HTML 内容的机器。"},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.5,
+            temperature=0.3,
             timeout=60
         )
         content = response.choices[0].message.content.strip()
