@@ -3,8 +3,9 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { getAllTools, getToolBySlug } from '../../lib/api';
 import { getLocale, t } from '../../lib/i18n';
+import ToolCard from '../../components/ToolCard';
 
-export default function ToolDetail({ tool }) {
+export default function ToolDetail({ tool, relatedTools }) {
   const locale = getLocale();
 
   if (!tool) {
@@ -21,13 +22,6 @@ export default function ToolDetail({ tool }) {
     name: tool.name,
     description: tool.description,
     url: `https://findingaitools.com/tool/${tool.slug}`,
-    applicationCategory: tool.tag,
-    operatingSystem: 'Web',
-    offers: {
-      '@type': 'Offer',
-      price: tool.pricing,
-      priceCurrency: 'USD',
-    },
   };
 
   return (
@@ -35,16 +29,25 @@ export default function ToolDetail({ tool }) {
       <Head>
         <title>{tool.name} - Finding AI Tools</title>
         <meta name="description" content={tool.description} />
-        <meta property="og:title" content={`${tool.name} - Finding AI Tools`} />
-        <meta property="og:description" content={tool.description} />
-        <meta property="og:url" content={`https://findingaitools.com/tool/${tool.slug}`} />
-        <meta property="og:type" content="article" />
-        <link rel="canonical" href={`https://findingaitools.com/tool/${tool.slug}`} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </Head>
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700">
+        {/* Breadcrumb */}
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+          <div className="max-w-3xl mx-auto px-4 py-3">
+            <nav className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+              <Link href="/" className="hover:text-indigo-600 dark:hover:text-indigo-400">Home</Link>
+              <span>›</span>
+              <Link href={`/?tag=${tool.tag}`} className="hover:text-indigo-600 dark:hover:text-indigo-400">{tool.tag}</Link>
+              <span>›</span>
+              <span className="text-gray-900 dark:text-gray-100 font-medium truncate">{tool.name}</span>
+            </nav>
+          </div>
+        </div>
+
+        {/* Header with back link */}
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <Link href="/" className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-2">
               ← {t('backToList')}
@@ -112,6 +115,20 @@ export default function ToolDetail({ tool }) {
               </a>
             </div>
           </article>
+
+          {/* Related Tools */}
+          {relatedTools.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                {locale === 'zh' ? '相关工具' : 'Related Tools'}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {relatedTools.slice(0, 4).map(t => (
+                  <ToolCard key={t.id} tool={t} />
+                ))}
+              </div>
+            </section>
+          )}
         </main>
       </div>
     </>
@@ -120,16 +137,22 @@ export default function ToolDetail({ tool }) {
 
 export async function getStaticPaths() {
   const tools = await getAllTools();
-  const paths = tools
-    .filter(t => t.slug)
-    .map(tool => ({ params: { slug: tool.slug } }));
+  const paths = tools.filter(t => t.slug).map(tool => ({ params: { slug: tool.slug } }));
   return { paths, fallback: 'blocking' };
 }
 
 export async function getStaticProps({ params }) {
   try {
-    const tool = await getToolBySlug(params.slug);
-    return { props: { tool }, revalidate: 60 };
+    const tools = await getAllTools();
+    const tool = tools.find(t => t.slug === params.slug);
+    
+    if (!tool) return { notFound: true };
+    
+    const relatedTools = tools
+      .filter(t => t.tag === tool.tag && t.id !== tool.id)
+      .slice(0, 4);
+    
+    return { props: { tool, relatedTools }, revalidate: 60 };
   } catch (error) {
     return { notFound: true };
   }
