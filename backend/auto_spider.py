@@ -355,12 +355,13 @@ def process_with_llm(raw_text: str) -> Optional[dict]:
 7. framework: Agent填框架；Tool填 "无"
 8. pricing: 免费/付费/免费\\/订阅
 9. description: 50-80字中文介绍
+10. stars: GitHub项目的Star数量（整数），非GitHub项目填0
 
 原文：
 {raw_text}
 
-输出严格JSON格式（9个字段）：
-{{"name":"","logo":"","url":"","type":"","tag":"","base_model":"","framework":"","pricing":"","description":""}}
+输出严格JSON格式（10个字段）：
+{{"name":"","logo":"","url":"","type":"","tag":"","base_model":"","framework":"","pricing":"","description":"","stars":0}}
 """
     
     print("🤖 正在呼叫 DeepSeek 进行智能解析...")

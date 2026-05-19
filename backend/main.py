@@ -66,6 +66,7 @@ class ToolSchema(BaseModel):
     pricing: str
     description: str
     content: Optional[str] = ""
+    stars: Optional[int] = 0
 
 @app.get("/api/tools", response_model=List[dict])
 def get_tools():
@@ -129,8 +130,8 @@ def add_tool(tool: ToolSchema):
         
         slug = make_slug(tool.name)
         cursor.execute(
-            "INSERT INTO tools (name, logo, url, type, tag, base_model, framework, pricing, description, slug) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (tool.name, tool.logo, tool.url, tool.type, tool.tag, tool.base_model, tool.framework, tool.pricing, tool.description, slug)
+            "INSERT INTO tools (name, logo, url, type, tag, base_model, framework, pricing, description, slug, stars) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (tool.name, tool.logo, tool.url, tool.type, tool.tag, tool.base_model, tool.framework, tool.pricing, tool.description, slug, tool.stars)
         )
         conn.commit()
         return {"status": "success", "message": f"产品 [{tool.name}] 录入成功！"}
