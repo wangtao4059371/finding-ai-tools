@@ -2,22 +2,19 @@ import { getAllTools } from '../lib/api';
 
 function generateSiteMap(tools, baseUrl) {
   return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${baseUrl}</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
   </url>
   ${tools.map(tool => `
   <url>
     <loc>${baseUrl}/tool/${tool.id}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
   </url>`).join('')}
 </urlset>`;
 }
@@ -31,7 +28,8 @@ export async function getServerSideProps({ res }) {
   const tools = await getAllTools();
   const sitemap = generateSiteMap(tools, baseUrl);
 
-  res.setHeader('Content-Type', 'text/xml');
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
   res.write(sitemap);
   res.end();
 
