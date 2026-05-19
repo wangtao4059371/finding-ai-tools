@@ -74,6 +74,13 @@ export default function ToolDetail({ tool }) {
 
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6 text-lg">{tool.description}</p>
 
+            {tool.content && (
+              <div 
+                className="prose dark:prose-invert prose-indigo max-w-none text-gray-700 dark:text-gray-300 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: tool.content }}
+              />
+            )}
+
             {tool.type === 'Agent' && (
               <div className="grid grid-cols-2 gap-4 mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                 <div>

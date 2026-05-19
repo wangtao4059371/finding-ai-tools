@@ -65,6 +65,7 @@ class ToolSchema(BaseModel):
     framework: str
     pricing: str
     description: str
+    content: Optional[str] = ""
 
 @app.get("/api/tools", response_model=List[dict])
 def get_tools():
@@ -99,6 +100,23 @@ def get_tool_by_slug(slug: str):
     if row is None:
         raise HTTPException(status_code=404, detail="工具不存在")
     return dict(row)
+
+@app.patch("/api/tools/{tool_name}/content")
+def update_tool_content(tool_name: str, data: dict):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    try:
+        content = data.get("content", "")
+        cursor.execute("UPDATE tools SET content = ? WHERE name = ?", (content, tool_name))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="工具不存在")
+        conn.commit()
+        return {"status": "success", "message": f"内容更新成功"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
 
 @app.post("/api/tools/add")
 def add_tool(tool: ToolSchema):

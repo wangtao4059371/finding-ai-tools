@@ -286,6 +286,56 @@ def fetch_all_ai_tools() -> List[str]:
     return all_data
 
 
+def generate_detail_content(name: str, description: str, tag: str, url: str) -> Optional[str]:
+    prompt = f"""你是一个专业的 AI 科技编辑。请为以下 AI 工具写详细的中文介绍。不少于 400 字。
+
+工具名称: {name}
+简短描述: {description}
+分类: {tag}
+官网: {url}
+
+按以下结构输出 HTML（只要 body 内的 HTML，不加任何解释）：
+
+<h2>概述</h2>
+<p>介绍这个工具的用途、特点和优势</p>
+
+<h2>核心功能</h2>
+<ul>
+<li>功能</li>
+</ul>
+
+<h2>适用场景</h2>
+<p>场景说明</p>
+
+<h2>优缺点</h2>
+<h3>优点</h3><ul><li></li></ul>
+<h3>缺点</h3><ul><li></li></ul>
+
+<h2>常见问题</h2>
+<h3>Q: </h3><p>A: </p>
+<h3>Q: </h3><p>A: </p>"""
+    
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "你是一个只输出 HTML 内容的机器。"},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5,
+            timeout=60
+        )
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```html"):
+            content = content.replace("```html", "").replace("```", "").strip()
+        elif content.startswith("```"):
+            content = content.replace("```", "").strip()
+        return content
+    except Exception as e:
+        print(f"  ❌ 内容生成失败: {e}")
+        return None
+
+
 def process_with_llm(raw_text: str) -> Optional[dict]:
     prompt = f"""
 你是一个专业的科技媒体编辑。请分析以下 AI 产品信息，提取关键要素，严格按 JSON 格式输出。
@@ -295,7 +345,7 @@ def process_with_llm(raw_text: str) -> Optional[dict]:
 2. logo: 使用 Google Favicon API 格式，如 https://www.google.com/s2/favicons?domain=官网域名&sz=128
 3. url: 产品官网链接
 4. type: "Agent" 或 "Tool"
-5. tag: Agent类可选(自治智能体/开发智能体/金融智能体/Agent框架)；Tool类可选(AI写作/AI绘画/AI视频/AI办公/开发工具/效率工具)
+5. tag: Agent类可选(自治智能体/开发智能体/金融智能体/Agent框架)；Tool类可选(AI写作/AI绘画/AI视频/AI音频/音乐/AI办公/开发工具/效率工具)
 6. base_model: Agent填基座模型；Tool填 "无"
 7. framework: Agent填框架；Tool填 "无"
 8. pricing: 免费/付费/免费\\/订阅
@@ -308,7 +358,7 @@ def process_with_llm(raw_text: str) -> Optional[dict]:
 {{"name":"","logo":"","url":"","type":"","tag":"","base_model":"","framework":"","pricing":"","description":""}}
 """
     
-    print("🤖 正在呼叫 MiniMax 大模型进行智能解析...")
+    print("🤖 正在呼叫 DeepSeek 进行智能解析...")
     try:
         response = client.chat.completions.create(
             model="deepseek-chat",
@@ -352,8 +402,24 @@ def publish_to_site(structured_data: dict):
             result = response.json()
             if result.get("status") == "skipped":
                 print(f"⏭️ {result.get('message')}")
-            else:
+            elif result.get("status") == "success":
                 print(f"✅ {result.get('message')}")
+                # 生成详细内容
+                print(f"📝 正在生成详细内容...")
+                content = generate_detail_content(
+                    structured_data['name'],
+                    structured_data.get('description', ''),
+                    structured_data.get('tag', ''),
+                    structured_data.get('url', '')
+                )
+                if content:
+                    # 发送内容到后端
+                    content_response = requests.patch(
+                        f"{LOCAL_SITE_URL.replace('/add', '')}/{structured_data['name']}/content",
+                        json={"content": content},
+                        timeout=10
+                    )
+                print(f"✨ 内容生成完成")
         else:
             print(f"❌ 发布失败，状态码: {response.status_code}")
     except Exception as e:
