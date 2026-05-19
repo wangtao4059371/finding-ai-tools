@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 大模型多维评分对比</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1a2e}
+.c{max-width:1500px;margin:0 auto;padding:20px}
+h1{text-align:center;margin:20px 0 5px;font-size:26px}
+.sub{text-align:center;color:#666;margin-bottom:16px;font-size:13px}
+
+.compare-bar{display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:20px;padding:12px;background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.04)}
+.compare-bar span{color:#888;font-size:13px}
+.compare-bar select{padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:13px;background:#fff;cursor:pointer;min-width:200px}
+.compare-bar select:focus{border-color:#6366f1;outline:none}
+.compare-bar .compare-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#6366f1;font-weight:600;background:#eef2ff;padding:6px 12px;border-radius:8px;cursor:pointer}
+.compare-bar .compare-status.hidden{display:none}
+
+.main{display:flex;gap:20px;align-items:flex-start}
+.left{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:16px}
+.sidebar{background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.04);overflow:hidden;max-height:calc(100vh - 200px);overflow-y:auto}
+.sidebar-header{padding:14px 16px;font-weight:700;font-size:13px;color:#999;border-bottom:1px solid #f0f0f0;position:sticky;top:0;background:#fff}
+.sidebar-item{padding:11px 16px;cursor:pointer;font-size:13px;border-bottom:1px solid #f8f8f8;transition:.15s;display:flex;justify-content:space-between;align-items:center}
+.sidebar-item img{width:18px;height:18px;border-radius:3px;margin-right:8px;flex-shrink:0}
+.sidebar-item:hover{background:#f5f3ff}
+.sidebar-item.active{background:#eef2ff;color:#6366f1;font-weight:700;border-left:3px solid #6366f1;padding-left:13px}
+.sidebar-item img{width:20px;height:20px;border-radius:4px;margin-right:8px;flex-shrink:0}
+.sidebar-item.active .score-sm{background:#ddd6fe;color:#6366f1}
+
+.info-box{background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.04);padding:20px}
+.score-num{font-size:40px;font-weight:800;color:#6366f1;line-height:1}
+.score-lbl{font-size:11px;color:#999;margin-top:2px}
+.bar{height:4px;background:#e8e8e8;border-radius:2px;margin:6px 0 12px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#6366f1,#a855f7);border-radius:2px}
+.meta{font-size:11px;color:#888;margin-bottom:8px}
+.desc{font-size:12px;color:#555;line-height:1.7;margin-bottom:10px;padding:10px;background:#f8fafc;border-radius:8px}
+.btn{display:inline-block;padding:8px 16px;background:#6366f1;color:#fff;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;width:100%;text-align:center;transition:.15s}
+.btn:hover{background:#4f46e5}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.tag{padding:3px 8px;border-radius:12px;font-size:10px;font-weight:600}
+.tag.g{background:#d1fae5;color:#065f46}
+.tag.r{background:#fee2e2;color:#991b1b}
+.tag.n{background:#f3f4f6;color:#6b7280}
+
+.content{flex:1;min-width:0}
+.info-col{width:300px;flex-shrink:0}
+.chart-box{background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,.04);padding:24px}
+.chart-title{font-size:17px;font-weight:700;margin-bottom:16px;text-align:center}
+
+.compare-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.compare-tbl th{text-align:left;padding:9px 10px;background:#f0f0f0;font-size:11px;color:#777}
+.compare-tbl th:first-child{border-radius:6px 0 0 0}
+.compare-tbl th:last-child{border-radius:0 6px 0 0}
+.compare-tbl td{padding:9px 10px;border-bottom:1px solid #f0f0f0}
+.compare-tbl td:first-child{font-weight:600;color:#555}
+.w{color:#dc2626;font-weight:700}
+.l{color:#16a34a}
+
+@media(max-width:950px){.main{flex-direction:column}.left{width:100%;flex-direction:row;gap:10px}.sidebar{width:100%;max-height:150px}.info-col{width:100%}}
+</style>
+</head>
+<body>
+<div class="c">
+<h1>AI 大模型多维评分体系</h1>
+<p class="sub">9 维度 × 26 款模型工程化评测 · 点击左侧切换模型 · 顶部下拉选对比模型</p>
+
+<div class="compare-bar">
+<span>当前: <strong id="cmn" style="color:#6366f1"></strong></span>
+<span>VS</span>
+<select id="cmpSel"><option value="-1">-- 选择对比模型 --</option></select>
+<span id="cmpBadge" class="compare-status hidden" onclick="clearCompare()">VS <strong id="cmpName"></strong> · ✕ 取消</span>
+</div>
+
+<div class="main">
+<div class="left">
+<div class="sidebar" id="sidebar"></div>
+</div>
+<div class="content">
+<div class="chart-box">
+<div class="chart-title" id="chartTitle"></div>
+<canvas id="chart" height="400"></canvas>
+<div class="tags" id="dimTags"></div>
+</div>
+</div>
+<div class="info-col"><div class="info-box" id="infoBox"></div></div>
+</div>
+</div>
+
+<script>
+var DIMS=[{k:'reasoning',l:'推理能力'},{k:'chinese',l:'中文能力'},{k:'coding',l:'编程能力'},{k:'math',l:'数学能力'},{k:'hallucination',l:'幻觉控制'},{k:'speed',l:'响应速度'},{k:'api_cost',l:'API成本'},{k:'agent',l:'Agent能力'},{k:'long_text',l:'长文本能力'}];
+
+var M=[
+{nm:"GPT-5.5 / Instant",co:"OpenAI（美国）",pr:"Plus $20/月, Pro $200/月",ur:"https://chat.openai.com",de:"全球大模型生态领头羊。5.5版本在海量异构数据聚合、高级系统重构等黑盒任务中稳定度极高，幻觉率降至历史最低。1M超长上下文与原生工具搜索为全自动化Agent提供了最佳工业底座。",re:9.8,ch:8.5,co_score:9.7,ma:9.6,ha:9.5,sp:7.5,ap:4,ag:9.8,lt:9},
+{nm:"Claude Opus 4.7",co:"Anthropic（美国）",pr:"Pro $20/月, API按量计费",ur:"https://claude.ai",de:"行业公认的长文本逻辑处理与代码重构王者。极度严谨的系统指令遵循度，输出客观精准无废话。在多步代码调试和复杂业务逻辑编排中表现如资深架构师。",re:9.7,ch:8.3,co_score:9.8,ma:9.4,ha:9.7,sp:7.2,ap:3.8,ag:9.2,lt:9.5},
+{nm:"Gemini 3.1 Pro",co:"Google DeepMind（美国）",pr:"Google One $19.99/月",ur:"https://deepmind.google/gemini",de:"谷歌原生多模态集大成之作，底层训练起就融合视频、音频、多维图表与文本。可直接传入长视频或整个站点多媒体素材，跨模态推理并深度集成Google生态。",re:9.2,ch:8,co_score:8.8,ma:9,ha:8.5,sp:8.5,ap:6.5,ag:8.8,lt:9.2},
+{nm:"Grok 3 Pro",co:"xAI（美国）",pr:"X Premium+ $16/月",ur:"https://x.ai/grok",de:"依托X平台实时数据流，拥有全网最强时效性信息捕捉能力。在硬核数学推理、逻辑编码和物理模拟上大幅进步，是实时数据聚合和动态市场分析类智能体的理想选择。",re:8.7,ch:7,co_score:8.5,ma:9.1,ha:7.5,sp:8.8,ap:7,ag:8,lt:7.5},
+{nm:"Command R7+",co:"Cohere（加拿大）",pr:"API按量计费",ur:"https://cohere.com",de:"专为企业级RAG和多语言商务协作定制的黑马模型。将所有算力集中在高精度上下文检索和工具调用上，在跨国供应链文档解析和多国语言合规审查上稳定性极强。",re:8.2,ch:7.2,co_score:7.8,ma:7.5,ha:8.8,sp:8.3,ap:7.2,ag:9,lt:8.5},
+{nm:"DeepSeek V4 Pro",co:"深度求索（中国）",pr:"API极具性价比,1M上下文",ur:"https://www.deepseek.com",de:"基础大模型领域最硬核黑马。在数学、STEM和硬核代码生成核心评测中具备正面迎战全球顶级闭源模型的底气。独特代币压缩算法与深度稀疏注意力机制，计算效率极致。",re:9.5,ch:9.2,co_score:9.6,ma:9.7,ha:8.8,sp:8.8,ap:9,ag:9.3,lt:9},
+{nm:"Qwen 3.6 Max",co:"阿里巴巴（中国）",pr:"API按量计费,开源免费",ur:"https://tongyi.aliyun.com",de:"通义千问3.6标志着阿里云在模型性能与开源生态上的双重胜利。全尺寸覆盖策略，多语言翻译、长文本商业报告摘要及中文本土商业逻辑推理表现优异。",re:9,ch:9.5,co_score:8.8,ma:8.7,ha:8.5,sp:8.7,ap:8.5,ag:8.9,lt:8.8},
+{nm:"ERNIE 5.1（文心）",co:"百度（中国）",pr:"API按量计费,高级会员",ur:"https://yiyan.baidu.com",de:"引入完全异步强化学习架构和智能体后训练技术实现性能反超。深度集成百度搜索资源矩阵，在中文长篇写作和本地化营销策划上有天然优势。",re:9.1,ch:9.6,co_score:8.5,ma:8.6,ha:8.7,sp:8.3,ap:7.5,ag:9.1,lt:8.5},
+{nm:"Kimi K2.6",co:"月之暗面（中国）",pr:"API按Token计费",ur:"https://kimi.moonshot.cn",de:"超长文本无损处理独树一帜。K2.6不仅延续长短文皆准优势，还在代码编写和Agent群体智能上重大升级。可轻松处理庞大代码库或几百页PDF并精准提取结构化信息。",re:8.9,ch:9.3,co_score:8.6,ma:8.2,ha:8.6,sp:8,ap:8.8,ag:9,lt:9.7},
+{nm:"GLM-5.1",co:"智谱AI（中国）",pr:"API按量计费,企业定制",ur:"https://www.zhipuai.cn",de:"深厚学术积累和严谨算法底座，在逻辑推理、Function Calling及复杂全链路Agent流程管理上表现出色，全模态能力可自动生成数据可视化图表。",re:8.8,ch:9.2,co_score:8.4,ma:8.5,ha:8.9,sp:8.6,ap:8.2,ag:8.7,lt:8.7},
+{nm:"Doubao Seed 2.0",co:"字节跳动（中国）",pr:"API超低定价",ur:"https://www.volcengine.com",de:"击穿行业的性价比和超高并发支持为核心卖点。语义理解流畅度和多轮高频对话意图捕捉细腻，语音流媒体合成技术国内领先。",re:8.7,ch:9.4,co_score:8,ma:8,ha:8.4,sp:9.3,ap:9.2,ag:8.5,lt:8.2},
+{nm:"HunYuan 3.5（混元）",co:"腾讯（中国）",pr:"API按量计费,腾讯云生态",ur:"https://cloud.tencent.com",de:"在生图、文生视频等多模态领域及微信QQ生态自动化文本理解上全方位迭代。极大加强了复杂长文本上下文检索与中文多轮对话连贯性。",re:8.5,ch:9.1,co_score:8.2,ma:8.1,ha:8.3,sp:8.4,ap:8,ag:8.3,lt:8.4},
+{nm:"SenseChat V6（商量）",co:"商汤科技（中国）",pr:"API按量计费,一体机部署",ur:"https://www.sensetime.com",de:"商汤科技核心大模型。凭借CV领域硬核底蕴，在多模态图文解析、空间几何逻辑推演、医疗/工业视觉图表理解上专业度极高。",re:8.3,ch:9,co_score:8.1,ma:8,ha:8.6,sp:8.2,ap:7,ag:8.4,lt:8},
+{nm:"Llama 4 Scout/Maverick",co:"Meta（美国）",pr:"完全开源免费",ur:"https://llama.meta.com",de:"彻底改变多模态大模型全球竞争格局。全新128专家架构在消费级节点就能跑出惊人效果，10M极限上下文，独立部署系统的最强开源底座。",re:9,ch:7.8,co_score:8.5,ma:8.8,ha:8,sp:9,ap:9.5,ag:8.2,lt:9.8},
+{nm:"Mistral Large 3",co:"Mistral AI（法国）",pr:"API按量计费",ur:"https://mistral.ai",de:"欧洲AI领头羊，坚持小参数高智能路线。最新旗舰在逻辑推理、多语言商务写作上不输欧美顶级闭源模型，Codestral 2是最受欢迎的开源代码引擎。",re:8.8,ch:7.5,co_score:9,ma:8.5,ha:8.3,sp:9.2,ap:8,ag:8.5,lt:8},
+{nm:"Phi-4 / Phi-4 Mini",co:"微软（美国）",pr:"开源免费,Azure托管",ur:"https://azure.microsoft.com",de:"端侧小模型天花板。高质量教科书级数据训练证明小参数也能拥有高智能。Mini版本可轻松部署在笔记本、手机甚至边缘设备上，速度极快。",re:7.8,ch:7,co_score:7.5,ma:7.2,ha:7.8,sp:9.5,ap:9.8,ag:7,lt:6.5},
+{nm:"Gemma 2.5",co:"Google（美国）",pr:"开源免费,允许商用",ur:"https://ai.google.dev",de:"谷歌开源阵营主力军。极度纯净的学术表现，数学逻辑、纯文本推导、指令严格遵循度上扎实可靠，是大模型底层算法研究的优质白盒底座。",re:7.5,ch:6.8,co_score:7,ma:7.8,ha:8.2,sp:9,ap:9.5,ag:7.2,lt:7},
+{nm:"Yi 3.5",co:"零一万物（中国）",pr:"API计费,部分开源",ur:"https://www.01.ai",de:"Yi-Lightning多次在LMSYS榜单逆袭，展现出惊人性价比与推理速度。中英文双语深度翻译、跨境电商文案生成方面语感优势明显。",re:8.6,ch:9,co_score:8.3,ma:8,ha:8.2,sp:9.1,ap:8.7,ag:8.1,lt:8.6},
+{nm:"Baichuan 4-Turbo",co:"百川智能（中国）",pr:"API计费,企业定制",ur:"https://www.baichuan-ai.com",de:"最大差异化优势在于长文本检索的无损精准度及医疗、传统文化等长尾专业领域的深度垂直微调。融合RAG技术解决专业问题胡言乱语。",re:8.4,ch:9,co_score:7.9,ma:7.8,ha:8.7,sp:8.5,ap:7.8,ag:8,lt:8.9},
+{nm:"TeleChat 2（天翼）",co:"中国电信（中国）",pr:"API计费,政企专网",ur:"https://www.chinatelecom.com.cn",de:"运营商背景大模型。深度融入海量政务、客服及行业标准数据，在公文写作、政策法规解读、客服话术自动生成等政企场景下合规准确率极高。",re:8,ch:9.1,co_score:7.5,ma:7.6,ha:8.8,sp:8.3,ap:7.5,ag:7.8,lt:8},
+{nm:"MiniMax ABAB 6.5",co:"MiniMax（中国）",pr:"API按量计费,海螺¥25/月",ur:"https://www.minimax.io",de:"国内泛娱乐与角色扮演领域绝对王者。拥有市面上极其细腻的情商与人设维持能力，多轮高频对话中能完美锁死设定的人设语气。",re:8.2,ch:9.3,co_score:7.8,ma:7.7,ha:8.1,sp:8.9,ap:8.6,ag:8.2,lt:8.3},
+{nm:"Stable Diff 3.5",co:"Stability AI（英国）",pr:"开源免费,API按次",ur:"https://stability.ai",de:"全球开源绘图生态绝对统治者。3.5版本在多主体排版、文字内嵌及空间透视逻辑上有质的飞跃，全球开发者基于它开发了数以万计的控制插件。",re:6.5,ch:6,co_score:2.5,ma:1.5,ha:7.5,sp:8,ap:9.5,ag:3.5,lt:2.5},
+{nm:"Flux.1 Pro",co:"Black Forest Labs（德国）",pr:"Pro API计费,Dev开源",ur:"https://blackforestlabs.ai",de:"由SD原班核心人马创立的颠覆性视觉模型。画质上限和超长提示词理解力惊人，在人类手部结构、复杂多人场景、真实照片级质感上表现硬核。",re:7.5,ch:6.8,co_score:2,ma:1.8,ha:8.8,sp:7,ap:6,ag:3,lt:3.5},
+{nm:"Sora 2.0 Pro",co:"OpenAI（美国）",pr:"定向API,影视订阅",ur:"https://openai.com/sora",de:"颠覆全球影视与视频生产的物理级模拟器。2.0版本修复了物理因果律漏洞，能模拟真实3D空间流体、光线折射及多镜头运动一致性，60秒超长视频生成。",re:8.5,ch:7,co_score:3.5,ma:3,ha:8,sp:4,ap:2,ag:5,lt:4},
+{nm:"Kling 2.0（可灵）",co:"快手（中国）",pr:"算力点卡,官方API",ur:"https://kling.kuaishou.com",de:"国内文生视频、图生视频领域绝对领跑者。运镜平滑度、大运动幅度肢体协调性及画面光影连续性成熟度极高，适合搭建短视频自动化剪辑流水线。",re:8,ch:8.5,co_score:3,ma:2.5,ha:7.8,sp:7.5,ap:7,ag:4.5,lt:3},
+{nm:"Viggle AI V2",co:"Viggle AI（美国）",pr:"Discord订阅,API集成",ur:"https://viggle.ai",de:"专注于角色动作完全可控的垂直多模态视频模型。将3D人体姿态控制与大模型视觉生成深度融合，只需一张静态照片和动作描述就能实现角色无缝动作替换。",re:7.8,ch:6.5,co_score:2,ma:1.5,ha:8.2,sp:7.2,ap:6.5,ag:3.5,lt:2}
+];
+
+function dim(m,k){return k==='reasoning'?m.re:k==='chinese'?m.ch:k==='coding'?m.co_score:k==='math'?m.ma:k==='hallucination'?m.ha:k==='speed'?m.sp:k==='api_cost'?m.ap:k==='agent'?m.ag:k==='long_text'?m.lt:0}
+function avg(m){return(DIMS.reduce(function(s,d){return s+dim(m,d.k)},0)/9).toFixed(1)}
+
+var chart=null, mainIdx=0, compareIdx=-1;
+
+function favicon(url){try{return'https://www.google.com/s2/favicons?domain='+new URL(url).hostname+'&sz=32'}catch(e){return''}}
+function init(){
+    var sb=document.getElementById('sidebar');
+    sb.innerHTML='<div class="sidebar-header">全部模型 ('+M.length+')</div>';
+    M.forEach(function(m,i){
+        sb.innerHTML+='<div class="sidebar-item" id="si-'+i+'" onclick="selectMain('+i+')"><img src="'+favicon(m.ur)+'" onerror="this.style.display=\'none\'">'+m.nm+'<span class="score-sm">'+avg(m)+'</span></div>';
+    });
+
+    var cs=document.getElementById('cmpSel');
+    cs.onchange=function(){
+        compareIdx=parseInt(this.value);
+        if(compareIdx>=0&&compareIdx===mainIdx){compareIdx=-1;this.value='-1';}
+        updateCmpBadge();render();
+    };
+
+    selectMain(0);
+}
+
+function selectMain(i){
+    mainIdx=i;compareIdx=-1;
+    document.getElementById('cmpSel').value='-1';
+    updateCmpBadge();
+    M.forEach(function(m,j){document.getElementById('si-'+j).className=j===i?'sidebar-item active':'sidebar-item';});
+    document.getElementById('cmn').textContent=M[i].nm;
+    rebuildCmpOptions();
+    render();
+}
+
+function rebuildCmpOptions(){
+    var cs=document.getElementById('cmpSel');
+    cs.innerHTML='<option value="-1">-- 选择对比模型 --</option>';
+    M.forEach(function(m,i){
+        if(i!==mainIdx) cs.innerHTML+='<option value="'+i+'">'+m.nm+'</option>';
+    });
+}
+
+function updateCmpBadge(){
+    var badge=document.getElementById('cmpBadge');
+    var cn=document.getElementById('cmpName');
+    if(compareIdx>=0){badge.classList.remove('hidden');cn.textContent=M[compareIdx].nm;}
+    else badge.classList.add('hidden');
+}
+
+function clearCompare(){compareIdx=-1;document.getElementById('cmpSel').value='-1';updateCmpBadge();render();}
+
+function render(){
+    if(chart){chart.destroy();chart=null}
+    var m=M[mainIdx];
+    var models=[m];
+    if(compareIdx>=0&&compareIdx!==mainIdx)models.push(M[compareIdx]);
+    var isCmp=models.length===2;
+
+    document.getElementById('chartTitle').textContent=isCmp?models[0].nm+'  VS  '+models[1].nm:models[0].nm;
+
+    // Chart
+    var datasets=models.map(function(mod,i){
+        var c=i===0?'rgba(99,102,241,':'rgba(239,68,68,';
+        return {label:mod.nm,data:DIMS.map(function(d){return dim(mod,d.k)}),backgroundColor:c+'0.2)',borderColor:c+'0.85)',borderWidth:2.5,pointBackgroundColor:c+'1)',pointRadius:4};
+    });
+
+    chart=new Chart(document.getElementById('chart').getContext('2d'),{
+        type:'radar',
+        data:{labels:DIMS.map(function(d){return d.l}),datasets:datasets},
+        options:{responsive:true,scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:11}},pointLabels:{font:{size:11}}}},plugins:{legend:{display:isCmp,position:'bottom'}}}
+    });
+
+    // Tags - show all 9 dimensions
+    var tags='';
+    DIMS.forEach(function(d){
+        var v=dim(m,d.k);
+        var cls='', icon='';
+        if(v>=9){cls='g';icon='🏆 ';}
+        else if(v>=8){cls='';icon='';}
+        else if(v>=6){cls='';icon='';}
+        else if(v>=4){cls='r';icon='';}
+        else{cls='r';icon='⚠️ ';}
+        tags+='<span class="tag '+(cls||'n')+'">'+icon+d.l+' '+v+'</span>';
+    });
+    document.getElementById('dimTags').innerHTML=tags;
+
+    // Left info box
+    var box=document.getElementById('infoBox');
+    if(isCmp){
+        var a=models[0],b=models[1];var rows='<tr><th>维度</th><th>'+a.nm+'</th><th>'+b.nm+'</th></tr>';
+        DIMS.forEach(function(d){
+            var va=dim(a,d.k),vb=dim(b,d.k);
+            rows+='<tr><td>'+d.l+'</td><td class="'+(va>vb?'w':vb>va?'l':'')+'">'+va+'</td><td class="'+(vb>va?'w':va>vb?'l':'')+'">'+vb+'</td></tr>';
+        });
+        var aa=avg(a),ab=avg(b);
+        rows+='<tr style="border-top:2px solid #ddd;font-weight:800"><td>综合评分</td><td class="'+(aa>ab?'w':'l')+'">'+aa+'</td><td class="'+(ab>aa?'w':'l')+'">'+ab+'</td></tr>';
+        box.innerHTML='<div style="font-weight:700;margin-bottom:10px;font-size:13px;color:#6366f1">对比详情</div><table class="compare-tbl">'+rows+'</table>';
+    }else{
+        var a=avg(m);
+        box.innerHTML='<div style="text-align:center"><div class="score-num">'+a+'</div><div class="score-lbl">综合评分 / 10</div><div class="bar"><div class="bar-fill" style="width:'+(a*10)+'%"></div></div></div><div class="meta"><strong>'+m.co+'</strong> · '+m.pr+'</div><div class="desc">'+m.de+'</div><a href="'+m.ur+'" target="_blank" class="btn">&#x1F310; 访问官网</a></div>';
+        // 保持上方的标签
+        document.getElementById('dimTags').innerHTML=tags;
+    }
+}
+
+init();
+</script>
+</body>
+</html>
