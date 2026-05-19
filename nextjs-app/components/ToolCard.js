@@ -46,9 +46,14 @@ export default function ToolCard({ tool }) {
             <span className="inline-block text-gray-500 dark:text-gray-400 text-xs"># {tool.tag}</span>
             <span className="text-xs font-medium text-green-600 dark:text-green-400">{tool.pricing}</span>
           </div>
-          <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-800 dark:group-hover:text-indigo-300 transition-colors">
-            {locale === 'zh' ? '访问项目' : 'Visit'} →
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            {tool.stars > 0 && (
+              <span className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">⭐ {tool.stars.toLocaleString()}</span>
+            )}
+            <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-800 dark:group-hover:text-indigo-300 transition-colors">
+              {locale === 'zh' ? '访问项目' : 'Visit'} →
+            </span>
+          </div>
         </div>
       </div>
     </Link>
