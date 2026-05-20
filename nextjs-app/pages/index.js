@@ -137,15 +137,15 @@ export default function Home() {
             </div>
 
             {/* Center: Chart */}
-            <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
               <div className="text-center font-bold text-lg mb-3 text-gray-900 dark:text-gray-100">
                 {isCmp ? `${models[0].nm}  VS  ${models[1].nm}` : models[0].nm}
               </div>
-              <div className="max-w-[560px] mx-auto">
+              <div className="max-w-[700px] mx-auto">
                 <Radar data={chartData} options={{
                   responsive:true,
-                  scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:14}},pointLabels:{font:{size:14,font:{weight:'bold'}}}}},
-                  plugins:{legend:{display:isCmp,position:'bottom',labels:{font:{size:14},padding:24}}}
+                  scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:15}},pointLabels:{font:{size:15,font:{weight:'bold'}}}}},
+                  plugins:{legend:{display:isCmp,position:'bottom',labels:{font:{size:15},padding:28}}}
                 }} />
               </div>
               <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
