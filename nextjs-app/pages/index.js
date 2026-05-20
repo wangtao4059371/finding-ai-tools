@@ -97,7 +97,7 @@ export default function Home() {
             <span className="text-gray-400 font-semibold">VS</span>
             <select value={compareIdx} onChange={e=>{const v=parseInt(e.target.value);setCompareIdx(v>=0&&v===mainIdx?-1:v)}}
               className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
-              <option value="-1">-- Select --</option>
+              <option value="-1">{locale==='zh'?'-- 选择对比 --':'-- Select --'}</option>
               {MODELS.map((mod,i)=>i!==mainIdx?<option key={i} value={i}>{mod.nm}</option>:null)}
             </select>
             {compareIdx>=0&&<span className="text-xs text-indigo-600 cursor-pointer" onClick={()=>setCompareIdx(-1)}>VS {MODELS[compareIdx].nm} ✕</span>}
@@ -159,14 +159,14 @@ export default function Home() {
                   <div>
                     <div className="text-center">
                       <div className="text-[56px] font-extrabold text-indigo-600">{avg(m)}</div>
-                      <div className="text-sm text-gray-400 mt-1">Overall Score / 10</div>
+                      <div className="text-sm text-gray-400 mt-1">{locale==='zh'?'综合评分':'Overall Score'} / 10</div>
                       <div className="h-2 bg-gray-100 rounded-full mt-4 mb-4 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{width:(+avg(m)*10)+'%'}} />
                       </div>
                     </div>
                     <div className="text-sm text-gray-500 mt-4 mb-3"><strong>{m.co}</strong> · {m.pr}</div>
                     <div className="text-[14px] text-gray-600 leading-relaxed bg-gray-50 rounded-lg p-4 mb-5">{m.de}</div>
-                    <a href={m.ur} target="_blank" rel="noopener noreferrer" className="block text-center py-3.5 bg-indigo-600 text-white rounded-lg text-base font-semibold hover:bg-indigo-700">🌐 Visit Website</a>
+                    <a href={m.ur} target="_blank" rel="noopener noreferrer" className="block text-center py-3.5 bg-indigo-600 text-white rounded-lg text-base font-semibold hover:bg-indigo-700">{locale==='zh'?'🌐 访问官网':'🌐 Visit Website'}</a>
                   </div>
                 )}
               </div>
