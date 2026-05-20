@@ -42,8 +42,8 @@ const MODELS = [
 ];
 
 const sortedByTotal = [...MODELS].sort((a,b) => b.total - a.total);
-function dim(m,k){return m[k]||0}
-function avg(m){return (DIMS.reduce((s,d)=>s+dim(m,d.k),0)/DIMS.length).toFixed(1)}
+function getDim(m,k){return m[k]||0}
+function avg(m){return (DIMS.reduce((s,d)=>s+getDim(m,d.k),0)/DIMS.length).toFixed(1)}
 function fav(url){try{return 'https://www.google.com/s2/favicons?domain='+new URL(url).hostname+'&sz=32'}catch(e){return''}}
 
 export default function Home() {
@@ -61,18 +61,18 @@ export default function Home() {
   const isCmp = models.length === 2;
 
   const tags = DIMS.map(d=>{
-    const v=dim(m,d.k);
+    const v=getDim(m,d.k);
     if(v>=80) return {cls:'bg-green-100 text-green-700',icon:'🏆',v};
     if(v<=30) return {cls:'bg-red-100 text-red-700',icon:'⚠️',v};
     return {cls:'bg-gray-100 text-gray-600',icon:'',v};
   });
 
-  const topDims = DIMS.filter(d=>dim(m,d.k)>=80);
-  const lowDims = DIMS.filter(d=>dim(m,d.k)<=30);
+  const topDims = DIMS.filter(d=>getDim(m,d.k)>=80);
+  const lowDims = DIMS.filter(d=>getDim(m,d.k)<=30);
   const summary = locale==='zh'
-    ? (topDims.length?`核心优势：${topDims.map(d=>d.l+dim(m,d.k)).join('、')}`:'')+(lowDims.length?` | 短板：${lowDims.map(d=>d.l+dim(m,d.k)).join('、')}`:'')
-    : (topDims.length?`Strengths: ${topDims.map(d=>d.le+dim(m,d.k)).join(', ')}`:'')+(lowDims.length?` | Weak: ${lowDims.map(d=>d.le+dim(m,d.k)).join(', ')}`:'');
-  let cmpSummary=''; if(isCmp){const a=[],b=[];DIMS.forEach(d=>{const va=dim(models[0],d.k),vb=dim(models[1],d.k);if(va>vb)a.push({l:locale==='zh'?d.l:d.le,diff:va-vb});else if(vb>va)b.push({l:locale==='zh'?d.l:d.le,diff:vb-va})});a.sort((x,y)=>y.diff-x.diff);b.sort((x,y)=>y.diff-x.diff);cmpSummary=locale==='zh'?`${models[0].nm.split(' ')[0]}领先：${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'} | ${models[1].nm.split(' ')[0]}领先：${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'}`:`${models[0].nm.split(' ')[0]} wins: ${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'} | ${models[1].nm.split(' ')[0]} wins: ${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'}`;}
+    ? (topDims.length?`核心优势：${topDims.map(d=>d.l+getDim(m,d.k)).join('、')}`:'')+(lowDims.length?` | 短板：${lowDims.map(d=>d.l+getDim(m,d.k)).join('、')}`:'')
+    : (topDims.length?`Strengths: ${topDims.map(d=>d.le+getDim(m,d.k)).join(', ')}`:'')+(lowDims.length?` | Weak: ${lowDims.map(d=>d.le+getDim(m,d.k)).join(', ')}`:'');
+  let cmpSummary=''; if(isCmp){const a=[],b=[];DIMS.forEach(d=>{const va=getDim(models[0],d.k),vb=getDim(models[1],d.k);if(va>vb)a.push({l:locale==='zh'?d.l:d.le,diff:va-vb});else if(vb>va)b.push({l:locale==='zh'?d.l:d.le,diff:vb-va})});a.sort((x,y)=>y.diff-x.diff);b.sort((x,y)=>y.diff-x.diff);cmpSummary=locale==='zh'?`${models[0].nm.split(' ')[0]}领先：${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'} | ${models[1].nm.split(' ')[0]}领先：${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'}`:`${models[0].nm.split(' ')[0]} wins: ${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'} | ${models[1].nm.split(' ')[0]} wins: ${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'}`;}
 
   return (
     <>
@@ -116,12 +116,12 @@ export default function Home() {
 
           {/* Dimension Bar Charts Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {DIMS.map(dim => {
-              const sorted = [...MODELS].sort((a,b) => dim(b,dim.k) - dim(a,dim.k));
+            {DIMS.map(d => {
+              const sorted = [...MODELS].sort((a,b) => getDim(b,d.k) - getDim(a,d.k));
               return (
-                <div key={dim.k} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+                <div key={d.k} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
                   <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                    {locale==='zh'?dim.l:dim.le}
+                    {locale==='zh'?d.l:d.le}
                   </h4>
                   <div className="space-y-1">
                     {sorted.slice(0,8).map((mod,i)=>(
@@ -129,9 +129,9 @@ export default function Home() {
                         <span className="w-4 text-gray-400 font-mono">{i+1}</span>
                         <span className="w-20 truncate text-gray-600 dark:text-gray-400">{mod.nm.split(' ')[0]}</span>
                         <div className="flex-1 h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div className="h-full bg-indigo-500 rounded-full transition-all" style={{width:dim(mod,dim.k)+'%'}} />
+                          <div className="h-full bg-indigo-500 rounded-full transition-all" style={{width:getDim(mod,d.k)+'%'}} />
                         </div>
-                        <span className="w-10 text-right font-semibold text-gray-700 dark:text-gray-300">{dim(mod,dim.k).toFixed(1)}</span>
+                        <span className="w-10 text-right font-semibold text-gray-700 dark:text-gray-300">{getDim(mod,d.k).toFixed(1)}</span>
                       </div>
                     ))}
                   </div>
@@ -180,7 +180,7 @@ export default function Home() {
                   labels={DIMS.map(d=>locale==='zh'?d.l:d.le)}
                   datasets={models.map((mod,i)=>({
                     label: mod.nm,
-                    data: DIMS.map(d=>dim(mod,d.k)),
+                    data: DIMS.map(d=>getDim(mod,d.k)),
                     backgroundColor: (i===0?'rgba(99,102,241,0.2)':'rgba(239,68,68,0.2)'),
                     borderColor: (i===0?'rgba(99,102,241,0.9)':'rgba(239,68,68,0.9)'),
                     borderWidth: 2.5,
@@ -206,7 +206,7 @@ export default function Home() {
                       <thead><tr className="text-gray-400 text-xs"><th className="text-left pb-2">{locale==='zh'?'维度':'Dim'}</th><th className="text-right pb-2 text-indigo-600 font-semibold">{models[0].nm.split(' ')[0]}</th><th className="text-right pb-2 text-red-500 font-semibold">{models[1].nm.split(' ')[0]}</th></tr></thead>
                       <tbody>
                         <tr className="border-t border-gray-50 dark:border-gray-700"><td className="py-2 text-gray-500 font-bold">{locale==='zh'?'总分':'Total'}</td><td className={`text-right py-2 font-bold ${models[0].total>models[1].total?'text-red-600':'text-green-600'}`}>{models[0].total.toFixed(1)}</td><td className={`text-right py-2 font-bold ${models[1].total>models[0].total?'text-red-600':'text-green-600'}`}>{models[1].total.toFixed(1)}</td></tr>
-                        {DIMS.map(d=>{const va=dim(models[0],d.k),vb=dim(models[1],d.k);return <tr key={d.k} className="border-t border-gray-50 dark:border-gray-700"><td className="py-2 text-gray-500">{locale==='zh'?d.l:d.le}</td><td className={`text-right py-2 font-semibold ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va.toFixed(1)}</td><td className={`text-right py-2 font-semibold ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb.toFixed(1)}</td></tr>;})}
+                        {DIMS.map(d=>{const va=getDim(models[0],d.k),vb=getDim(models[1],d.k);return <tr key={d.k} className="border-t border-gray-50 dark:border-gray-700"><td className="py-2 text-gray-500">{locale==='zh'?d.l:d.le}</td><td className={`text-right py-2 font-semibold ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va.toFixed(1)}</td><td className={`text-right py-2 font-semibold ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb.toFixed(1)}</td></tr>;})}
                       </tbody>
                     </table>
                   </div>
