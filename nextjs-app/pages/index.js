@@ -135,12 +135,12 @@ export default function Home() {
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-7">
                 {isCmp?(
                   <div>
-                    <div className="font-bold text-lg text-indigo-600 mb-4">Comparison</div>
+                    <div className="font-bold text-lg text-indigo-600 mb-4">{locale==='zh'?'对比详情':'Comparison'}</div>
                     <table className="w-full text-[15px]">
-                      <thead><tr className="text-gray-400 text-xs"><th className="text-left pb-2">Dim</th><th className="text-right pb-2">A</th><th className="text-right pb-2">B</th></tr></thead>
+                      <thead><tr className="text-gray-400 text-xs"><th className="text-left pb-2">{locale==='zh'?'维度':'Dim'}</th><th className="text-right pb-2 text-indigo-600 font-semibold">{models[0].nm.split(' ')[0]}</th><th className="text-right pb-2 text-red-500 font-semibold">{models[1].nm.split(' ')[0]}</th></tr></thead>
                       <tbody>
-                        {DIMS.map(d=>{const va=dim(models[0],d.k),vb=dim(models[1],d.k);return <tr key={d.k} className="border-t border-gray-50"><td className="py-2 text-gray-500">{d.l}</td><td className={`text-right py-2 font-semibold ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va}</td><td className={`text-right py-2 font-semibold ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb}</td></tr>;})}
-                        <tr className="border-t-2 border-gray-200 font-extrabold"><td className="py-2">Overall</td><td className={`text-right py-2 ${+avg(models[0])>+avg(models[1])?'text-red-600':'text-green-600'}`}>{avg(models[0])}</td><td className={`text-right py-2 ${+avg(models[1])>+avg(models[0])?'text-red-600':'text-green-600'}`}>{avg(models[1])}</td></tr>
+                        {DIMS.map(d=>{const va=dim(models[0],d.k),vb=dim(models[1],d.k);return <tr key={d.k} className="border-t border-gray-50 dark:border-gray-700"><td className="py-2 text-gray-500">{locale==='zh'?d.l:d.k}</td><td className={`text-right py-2 font-semibold ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va}</td><td className={`text-right py-2 font-semibold ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb}</td></tr>;})}
+                        <tr className="border-t-2 border-gray-200 dark:border-gray-600 font-extrabold"><td className="py-2">{locale==='zh'?'综合':'Overall'}</td><td className={`text-right py-2 ${+avg(models[0])>+avg(models[1])?'text-red-600':'text-green-600'}`}>{avg(models[0])}</td><td className={`text-right py-2 ${+avg(models[1])>+avg(models[0])?'text-red-600':'text-green-600'}`}>{avg(models[1])}</td></tr>
                       </tbody>
                     </table>
                   </div>
