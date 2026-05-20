@@ -2,9 +2,11 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Nav from '../components/Nav';
-import RadarChart from '../components/RadarChart';
 import { getModelRatings } from '../lib/api';
 import { getLocale } from '../lib/i18n';
+import dynamic from 'next/dynamic';
+
+const RadarChart = dynamic(() => import('../components/RadarChart'), { ssr: false });
 
 const DIMS = [
   {k:'reasoning',l:'推理能力'},{k:'chinese',l:'中文能力'},{k:'coding',l:'编程能力'},{k:'math',l:'数学能力'},
