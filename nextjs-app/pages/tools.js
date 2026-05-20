@@ -5,6 +5,7 @@ import { getLocale, t } from '../lib/i18n';
 import Nav from '../components/Nav';
 import ToolCard from '../components/ToolCard';
 import FilterTags from '../components/FilterTags';
+import AiRecommend from '../components/AiRecommend';
 
 const PAGE_SIZE = 12;
 
@@ -119,6 +120,36 @@ export default function Tools({ tools }) {
           </div>
         </section>
 
+        {/* Featured Tools + AI Recommend */}
+        <section className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
+                {locale === 'zh' ? '✨ 精选推荐' : '✨ Featured'}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {tools.filter(t=>t.slug).slice(0,3).map(tool => (
+                  <a key={tool.id} href={`/tool/${tool.slug}`} className="group">
+                    <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950 dark:via-purple-950 dark:to-pink-950 rounded-xl p-5 border border-indigo-100 dark:border-indigo-900 hover:shadow-lg transition-all group-hover:scale-[1.02] h-full">
+                      <div className="flex items-center gap-3 mb-3">
+                        <img src={tool.logo} alt="" className="w-10 h-10 rounded-lg" onError={e=>e.target.style.display='none'} />
+                        <div>
+                          <div className="font-bold text-gray-900 dark:text-gray-100 text-sm">{tool.name}</div>
+                          <span className="text-xs text-gray-500">#{tool.tag}</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">{tool.description}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div className="lg:w-80 flex-shrink-0">
+              <AiRecommend locale={locale} />
+            </div>
+          </div>
+        </section>
+
         {/* Search + Sort + Filter */}
         <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 sticky top-[73px] z-40">
           <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-3">
@@ -143,20 +174,26 @@ export default function Tools({ tools }) {
                 <option value="name">{locale === 'zh' ? '名称 A-Z' : 'Name A-Z'}</option>
               </select>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap items-center">
               {['全部','免费','付费','开源'].map(f => (
                 <button key={f} onClick={() => { setSearchQuery(f==='全部'?'':f); setPage(1); }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${searchQuery===f||(f==='全部'&&!searchQuery)?'bg-indigo-600 text-white':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${searchQuery===f||(f==='全部'&&!searchQuery)?'bg-indigo-600 text-white shadow-sm':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
                   {f}
                 </button>
               ))}
-              <span className="text-gray-300 dark:text-gray-600">|</span>
+              <span className="text-gray-300 dark:text-gray-600 mx-0.5">|</span>
               {['Agent','Tool'].map(t => (
                 <button key={t} onClick={() => { setSearchQuery(t); setPage(1); }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${searchQuery===t?'bg-indigo-600 text-white':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${searchQuery===t?'bg-indigo-600 text-white shadow-sm':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
                   {t}
                 </button>
               ))}
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(''); setPage(1); }}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                  ✕ {locale==='zh'?'清除':'Clear'}
+                </button>
+              )}
             </div>
           </div>
         </div>

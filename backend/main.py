@@ -130,6 +130,64 @@ def get_model_ratings():
     return [dict(row) for row in rows]
 
 
+@app.post("/api/ai-recommend")
+def ai_recommend(data: dict):
+    query = data.get("query", "")
+    if not query:
+        raise HTTPException(status_code=400, detail="请输入需求描述")
+    
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, description, tag, url, slug FROM tools WHERE slug IS NOT NULL AND slug != ''")
+    tools = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    
+    catalog = "\n".join([f"- {t['name']} ({t['tag']}): {t['description'][:100]}" for t in tools])
+    
+    try:
+        from openai import OpenAI
+        import os
+        api_key = os.getenv("DEEPSEEK_API_KEY") or os.getenv("MINIMAX_API_KEY")
+        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com/v1")
+        
+        prompt = f"""你是 AI 工具推荐专家。根据用户需求，从工具库中推荐最匹配的 5 个工具。
+只输出 JSON: {{"reason":"推荐理由(一句话)","slugs":["slug1","slug2"]}}
+
+工具库：
+{catalog}
+
+用户需求：{query}"""
+        
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[{"role":"system","content":"只输出JSON"},{"role":"user","content":prompt}],
+            temperature=0.3, timeout=30
+        )
+        text = response.choices[0].message.content.strip()
+        if text.startswith("```"): text = text.replace("```json","").replace("```","").strip()
+        
+        import json
+        result = json.loads(text)
+        slugs = result.get("slugs", [])[:5]
+        reason = result.get("reason", "")
+        
+        # 匹配工具
+        conn2 = sqlite3.connect(DB_FILE)
+        conn2.row_factory = sqlite3.Row
+        placeholders = ",".join(["?" for _ in slugs])
+        rows = []
+        if slugs:
+            cursor2 = conn2.cursor()
+            cursor2.execute(f"SELECT * FROM tools WHERE slug IN ({placeholders})", slugs)
+            rows = [dict(r) for r in cursor2.fetchall()]
+        conn2.close()
+        
+        return {"reason": reason, "tools": rows}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/tools/add")
 def add_tool(tool: ToolSchema):
     conn = sqlite3.connect(DB_FILE)
