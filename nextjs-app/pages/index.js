@@ -141,14 +141,14 @@ export default function Home() {
         {/* 2. Total Score Vertical Bar Chart */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">{locale==='zh'?'📊 总分排名':'📊 Total Score Ranking'}</h3>
-          <div className="flex items-end gap-1 h-[300px] px-2">
+          <div className="flex items-end gap-0.5 h-[300px] px-2 max-w-full overflow-x-auto">
             {sortedByTotal.map((mod,i)=>(
-              <div key={i} className="flex-1 flex flex-col items-center justify-end h-full cursor-pointer group" onClick={()=>setMainIdx(i)} title={`${mod.nm}: ${mod.total.toFixed(1)}`}>
-                <span className="text-[10px] text-gray-500 mb-1 font-mono">{mod.total.toFixed(1)}</span>
-                <div className="w-full rounded-t transition-all group-hover:opacity-80" style={{height:mod.total*3+'px',backgroundColor:COLORS[i%COLORS.length],minHeight:2}}/>
-                <div className="flex items-center gap-1 mt-1">
+              <div key={i} className="flex flex-col items-center justify-end h-full cursor-pointer group flex-shrink-0" style={{width:'3.5%'}} onClick={()=>setMainIdx(i)} title={`${mod.nm}: ${mod.total.toFixed(1)}`}>
+                <span className="text-[9px] text-gray-400 mb-0.5 font-mono">{mod.total.toFixed(0)}</span>
+                <div className="w-[60%] rounded-t transition-all group-hover:opacity-80" style={{height:mod.total*3+'px',backgroundColor:COLORS[i%COLORS.length],minHeight:2}}/>
+                <div className="flex items-center gap-0.5 mt-1">
                   <ModelLogo mod={mod} size="sm"/>
-                  <span className="text-[10px] text-gray-500 truncate w-16 text-center leading-tight">{mod.nm.split(' ')[0]}</span>
+                  <span className="text-[7px] text-gray-500 text-center leading-tight" style={{writingMode:'vertical-rl',textOrientation:'mixed',maxHeight:60}}>{mod.nm.split(' ')[0]}</span>
                 </div>
               </div>
             ))}
@@ -162,12 +162,12 @@ export default function Home() {
             return(
               <div key={d.k} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">{locale==='zh'?d.l:d.le}</h4>
-                <div className="flex items-end gap-0.5 h-[200px]">
+                <div className="flex items-end gap-[1px] h-[200px]">
                   {sorted.slice(0,12).map((mod,i)=>(
-                    <div key={i} className="flex-1 flex flex-col items-center justify-end h-full cursor-pointer group" onClick={()=>{const idx=MODELS.indexOf(mod);if(idx>=0)setMainIdx(idx)}}>
-                      <span className="text-[9px] text-gray-400 font-mono">{getDim(mod,d.k).toFixed(0)}</span>
-                      <div className="w-full rounded-t transition-all group-hover:opacity-80" style={{height:getDim(mod,d.k)*2+'px',backgroundColor:COLORS[MODELS.indexOf(mod)%COLORS.length],minHeight:1}}/>
-                      <span className="text-[8px] text-gray-400 mt-0.5 w-12 text-center truncate">{mod.nm.split(' ')[0]}</span>
+                    <div key={i} className="flex flex-col items-center justify-end h-full cursor-pointer group flex-shrink-0" style={{width:'7.8%'}} onClick={()=>{const idx=MODELS.indexOf(mod);if(idx>=0)setMainIdx(idx)}}>
+                      <span className="text-[8px] text-gray-400 font-mono">{getDim(mod,d.k).toFixed(0)}</span>
+                      <div className="w-[50%] rounded-t transition-all group-hover:opacity-80" style={{height:getDim(mod,d.k)*1.8+'px',backgroundColor:COLORS[MODELS.indexOf(mod)%COLORS.length],minHeight:1}}/>
+                      <span className="text-[7px] text-gray-400 mt-0.5" style={{writingMode:'vertical-rl',textOrientation:'mixed',maxHeight:50}}>{mod.nm.split(' ')[0]}</span>
                     </div>
                   ))}
                 </div>
