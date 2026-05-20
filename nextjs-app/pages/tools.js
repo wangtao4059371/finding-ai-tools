@@ -5,7 +5,6 @@ import { getLocale, t } from '../lib/i18n';
 import Nav from '../components/Nav';
 import ToolCard from '../components/ToolCard';
 import FilterTags from '../components/FilterTags';
-import AiRecommend from '../components/AiRecommend';
 
 const PAGE_SIZE = 12;
 
@@ -143,9 +142,6 @@ export default function Tools({ tools }) {
                   </a>
                 ))}
               </div>
-            </div>
-            <div className="lg:w-80 flex-shrink-0">
-              <AiRecommend locale={locale} />
             </div>
           </div>
         </section>
