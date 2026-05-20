@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { getAllTools } from '../lib/api';
 import { getLocale, t } from '../lib/i18n';
@@ -31,14 +31,16 @@ export default function Tools({ tools }) {
   const [activeTag, setActiveTag] = useState('全部');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [locale, setLocale] = useState('en');
-  const [sortBy, setSortBy] = useState('default');
-  const [showBackTop, setShowBackTop] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const firstVisit = useRef(true);
 
   useEffect(() => {
     setLocale(getLocale());
-    setTimeout(() => setLoading(false), 800);
+    if (firstVisit.current) {
+      firstVisit.current = false;
+      setLoading(true);
+      setTimeout(() => setLoading(false), 800);
+    }
   }, []);
 
   useEffect(() => {
