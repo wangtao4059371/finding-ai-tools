@@ -69,9 +69,9 @@ export default function Home() {
   const topDims = DIMS.filter(d=>dim(m,d.k)>=9);
   const lowDims = DIMS.filter(d=>dim(m,d.k)<=5);
   const summary = locale==='zh'
-    ? (topDims.length?`核心优势：${topDims.map(k=>DIMS.find(d=>d.k===k).l+dim(m,k)).join('、')}`:'')+(lowDims.length?` | 短板：${lowDims.map(k=>DIMS.find(d=>d.k===k).l+dim(m,k)).join('、')}`:'')
-    : (topDims.length?`Strengths: ${topDims.map(k=>DIMS.find(d=>d.k===k).le+dim(m,k)).join(', ')}`:'')+(lowDims.length?` | Weak: ${lowDims.map(k=>DIMS.find(d=>d.k===k).le+dim(m,k)).join(', ')}`:'');
-  let cmpSummary=''; if(isCmp){const a=[],b=[];DIMS.forEach(d=>{const va=dim(models[0],d.k),vb=dim(models[1],d.k);if(va>vb)a.push({l:locale==='zh'?d.l:d.le,diff:va-vb});else if(vb>va)b.push({l:locale==='zh'?d.l:d.le,diff:vb-va})});a.sort((x,y)=>y.diff-x.diff);b.sort((x,y)=>y.diff-x.diff);cmpSummary=locale==='zh'?`${models[0].nm.split(' ')[0]}领先：${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'}  |  ${models[1].nm.split(' ')[0]}领先：${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'}`:`${models[0].nm.split(' ')[0]} wins: ${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'}  |  ${models[1].nm.split(' ')[0]} wins: ${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'}`;}
+    ? (topDims.length?`核心优势：${topDims.map(d=>d.l+dim(m,d.k)).join('、')}`:'')+(lowDims.length?` | 短板：${lowDims.map(d=>d.l+dim(m,d.k)).join('、')}`:'')
+    : (topDims.length?`Strengths: ${topDims.map(d=>d.le+dim(m,d.k)).join(', ')}`:'')+(lowDims.length?` | Weak: ${lowDims.map(d=>d.le+dim(m,d.k)).join(', ')}`:'');
+  let cmpSummary=''; if(isCmp){const a=[],b=[];DIMS.forEach(d=>{const va=dim(models[0],d.k),vb=dim(models[1],d.k);if(va>vb)a.push({l:locale==='zh'?d.l:d.le,diff:va-vb});else if(vb>va)b.push({l:locale==='zh'?d.l:d.le,diff:vb-va})});a.sort((x,y)=>y.diff-x.diff);b.sort((x,y)=>y.diff-x.diff);cmpSummary=locale==='zh'?`${models[0].nm.split(' ')[0]}领先：${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'} | ${models[1].nm.split(' ')[0]}领先：${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join('、'):'—'}`:`${models[0].nm.split(' ')[0]} wins: ${a.length?a.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'} | ${models[1].nm.split(' ')[0]} wins: ${b.length?b.slice(0,3).map(d=>d.l+'+'+d.diff.toFixed(1)).join(', '):'—'}`;}
 
   return (
     <>
