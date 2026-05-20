@@ -119,6 +119,17 @@ def update_tool_content(tool_name: str, data: dict):
         conn.close()
 
 
+@app.get("/api/models/ratings", response_model=List[dict])
+def get_model_ratings():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM model_ratings ORDER BY id")
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
 @app.post("/api/tools/add")
 def add_tool(tool: ToolSchema):
     conn = sqlite3.connect(DB_FILE)

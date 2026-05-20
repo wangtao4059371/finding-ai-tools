@@ -22,6 +22,7 @@ export default function ToolCard({ tool }) {
                 height={56}
                 className="rounded-xl bg-gray-100 dark:bg-gray-700 object-cover border border-gray-200 dark:border-gray-600 transition-transform group-hover:scale-110"
                 unoptimized
+                loading="lazy"
               />
               <div className="absolute inset-0 rounded-xl bg-indigo-500 opacity-0 group-hover:opacity-20 transition-opacity" />
             </div>

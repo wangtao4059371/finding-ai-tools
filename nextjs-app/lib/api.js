@@ -11,3 +11,11 @@ export async function getToolBySlug(slug) {
   if (!res.ok) throw new Error(`Tool ${slug} not found`);
   return res.json();
 }
+
+export async function getModelRatings() {
+  try {
+    const res = await fetch(`${API_BASE}/api/models/ratings`);
+    if (res.ok) return res.json();
+  } catch (e) {}
+  return null;
+}

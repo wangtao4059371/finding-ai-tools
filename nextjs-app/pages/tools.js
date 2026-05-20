@@ -116,26 +116,43 @@ export default function Tools({ tools }) {
 
         {/* Search + Sort + Filter */}
         <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 sticky top-[73px] z-40">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row gap-3 items-center">
-            <div className="relative flex-1 w-full">
-              <input
-                type="text"
-                placeholder={t('searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-                className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-              />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 items-center">
+              <div className="relative flex-1 w-full">
+                <input
+                  type="text"
+                  placeholder={t('searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+                  className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm"
+              >
+                <option value="default">{locale === 'zh' ? '默认排序' : 'Default'}</option>
+                <option value="popular">{locale === 'zh' ? '最新收录' : 'Latest'}</option>
+                <option value="name">{locale === 'zh' ? '名称 A-Z' : 'Name A-Z'}</option>
+              </select>
             </div>
-            <select
-              value={sortBy}
-              onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="default">{locale === 'zh' ? '默认排序' : 'Default'}</option>
-              <option value="popular">{locale === 'zh' ? '最新收录' : 'Latest'}</option>
-              <option value="name">{locale === 'zh' ? '名称 A-Z' : 'Name A-Z'}</option>
-            </select>
+            <div className="flex gap-2 flex-wrap">
+              {['全部','免费','付费','开源'].map(f => (
+                <button key={f} onClick={() => { setSearchQuery(f==='全部'?'':f); setPage(1); }}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${searchQuery===f||(f==='全部'&&!searchQuery)?'bg-indigo-600 text-white':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                  {f}
+                </button>
+              ))}
+              <span className="text-gray-300 dark:text-gray-600">|</span>
+              {['Agent','Tool'].map(t => (
+                <button key={t} onClick={() => setSearchQuery(t); setPage(1);}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${searchQuery===t?'bg-indigo-600 text-white':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

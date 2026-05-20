@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { Radar } from 'react-chartjs-2';
 import { Chart, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import Nav from '../components/Nav';
+import { getModelRatings } from '../lib/api';
 import { getLocale } from '../lib/i18n';
 
 Chart.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
@@ -50,14 +51,16 @@ export default function Home() {
   const [mainIdx, setMainIdx] = useState(0);
   const [compareIdx, setCompareIdx] = useState(-1);
   const [locale, setLocale] = useState('en');
+  const [apiModels, setApiModels] = useState(null);
 
-  useEffect(() => { setMounted(true); setLocale(getLocale()); }, []);
+  useEffect(() => { setMounted(true); setLocale(getLocale()); getModelRatings().then(data => { if(data && data.length) setApiModels(data); }).catch(()=>{}); }, []);
 
   if (!mounted) return null;
 
-  const m = MODELS[mainIdx];
+  const activeModels = apiModels || MODELS;
+  const m = activeModels[mainIdx];
   const models = [m];
-  if (compareIdx >= 0 && compareIdx !== mainIdx) models.push(MODELS[compareIdx]);
+  if (compareIdx >= 0 && compareIdx !== mainIdx) models.push(activeModels[compareIdx]);
   const isCmp = models.length === 2;
 
   const chartData = {
@@ -83,8 +86,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>AI 大模型多维评分 - Finding AI Tools</title>
-        <meta name="description" content="9维度 x 26款主流AI大模型工程化评测对比，支持1v1深入对比" />
+        <title>AI Models Comparison & Ratings 2026 - Finding AI Tools</title>
+        <meta name="description" content="Compare 26 AI models with 9-dimension radar chart. GPT-5.5, DeepSeek, Claude, Gemini, Qwen ratings. Find the best AI model." />
       </Head>
       <Nav />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -94,7 +97,7 @@ export default function Home() {
                 {locale==='zh'?'AI 大模型多维评分体系':'AI Model Multi-Dimensional Ratings'}
               </h2>
               <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                {locale==='zh'?`9 维度 × ${MODELS.length} 款模型工程化评测 · 点击左侧切换模型 · 下拉选第二模型进行 1v1 对比`:`9 dimensions × ${MODELS.length} models benchmarked · Click sidebar to switch · Select second model for 1v1 comparison`}
+                {locale==='zh'?`9 维度 × ${activeModels.length} 款模型工程化评测 · 点击左侧切换模型 · 下拉选第二模型进行 1v1 对比`:`9 dimensions × ${activeModels.length} models benchmarked · Click sidebar to switch · Select second model for 1v1 comparison`}
               </p>
           </div>
 
@@ -107,20 +110,20 @@ export default function Home() {
               className="px-3 py-1.5 border-2 border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:border-indigo-500 outline-none"
             >
               <option value="-1">{locale==='zh'?'-- 选择对比模型 --':'-- Select to Compare --'}</option>
-              {MODELS.map((mod,i) => i!==mainIdx ? <option key={i} value={i}>{mod.nm}</option> : null)}
+              {activeModels.map((mod,i) => i!==mainIdx ? <option key={i} value={i}>{mod.nm}</option> : null)}
             </select>
             {compareIdx >= 0 && (
               <span className="bg-indigo-50 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded text-xs cursor-pointer font-medium" onClick={()=>setCompareIdx(-1)}>
-                VS {MODELS[compareIdx].nm} · ✕ {locale==='zh'?'取消':'Cancel'}
+                VS {activeModels[compareIdx].nm} · ✕ {locale==='zh'?'取消':'Cancel'}
               </span>
             )}
           </div>
 
-          <div className="flex gap-5 items-start">
+          <div className="flex flex-col xl:flex-row gap-5 items-start">
             {/* Left: Model List */}
-            <div className="w-[300px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[calc(100vh-180px)] overflow-y-auto">
-              <div className="px-5 py-3.5 text-sm font-bold text-gray-400 uppercase border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">{locale==='zh'?'全部模型':'All Models'} ({MODELS.length})</div>
-              {MODELS.map((mod,i)=>(
+            <div className="w-full xl:w-[300px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[300px] xl:max-h-[calc(100vh-180px)] overflow-y-auto">
+              <div className="px-5 py-3.5 text-sm font-bold text-gray-400 uppercase border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">{locale==='zh'?'全部模型':'All Models'} ({activeModels.length})</div>
+              {activeModels.map((mod,i)=>(
                 <div
                   key={i}
                   onClick={()=>{setMainIdx(i);setCompareIdx(-1)}}
@@ -129,7 +132,7 @@ export default function Home() {
                       ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold border-l-[3px] border-l-indigo-600 pl-[17px]'
                       : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                 >
-                  <img src={fav(mod.ur)} className="w-[22px] h-[22px] rounded flex-shrink-0" alt="" onError={e=>e.target.style.display='none'} />
+                  <img loading="lazy" src={fav(mod.ur)} className="w-[22px] h-[22px] rounded flex-shrink-0" alt="" onError={e=>e.target.style.display='none'} />
                   <span className="truncate flex-1">{mod.nm}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">{avg(mod)}</span>
                 </div>
@@ -156,7 +159,7 @@ export default function Home() {
             </div>
 
             {/* Right: Info */}
-            <div className="w-[340px] flex-shrink-0">
+            <div className="w-full xl:w-[340px] flex-shrink-0">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-7">
                 {isCmp ? (
                   <div>

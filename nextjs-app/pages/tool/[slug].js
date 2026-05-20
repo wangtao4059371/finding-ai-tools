@@ -65,6 +65,7 @@ export default function ToolDetail({ tool, relatedTools }) {
                 height={80}
                 className="rounded-xl bg-gray-100 dark:bg-gray-700 object-cover border border-gray-200 dark:border-gray-600"
                 unoptimized
+                loading="lazy"
               />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{tool.name}</h1>
