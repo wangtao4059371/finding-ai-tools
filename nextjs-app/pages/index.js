@@ -57,7 +57,7 @@ export default function Home() {
 
   if (!mounted) return null;
 
-  const activeModels = apiModels || MODELS;
+  const activeModels = (apiModels && apiModels.length) ? apiModels : MODELS;
   const m = activeModels[mainIdx];
   const models = [m];
   if (compareIdx >= 0 && compareIdx !== mainIdx) models.push(activeModels[compareIdx]);
