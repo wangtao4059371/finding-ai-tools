@@ -90,32 +90,36 @@ export default function Home() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-[1600px] mx-auto px-6 py-6">
           <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AI 大模型多维评分体系</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">9 维度 × {MODELS.length} 款模型工程化评测 · 点击左侧切换模型 · 下拉选第二模型进行 1v1 对比</p>
+<h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {locale==='zh'?'AI 大模型多维评分体系':'AI Model Multi-Dimensional Ratings'}
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                {locale==='zh'?`9 维度 × ${MODELS.length} 款模型工程化评测 · 点击左侧切换模型 · 下拉选第二模型进行 1v1 对比`:`9 dimensions × ${MODELS.length} models benchmarked · Click sidebar to switch · Select second model for 1v1 comparison`}
+              </p>
           </div>
 
           <div className="flex justify-center items-center gap-3 mb-5 text-sm flex-wrap">
-            <span className="text-gray-500">当前: <strong className="text-indigo-600 dark:text-indigo-400">{m.nm}</strong></span>
+            <span className="text-gray-500">{locale==='zh'?'当前':'Current'}: <strong className="text-indigo-600 dark:text-indigo-400">{m.nm}</strong></span>
             <span className="text-gray-400 font-semibold">VS</span>
             <select
               value={compareIdx}
               onChange={e=>{const v=parseInt(e.target.value);setCompareIdx(v>=0&&v===mainIdx?-1:v)}}
               className="px-3 py-1.5 border-2 border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:border-indigo-500 outline-none"
             >
-              <option value="-1">-- 选择对比模型 --</option>
+              <option value="-1">{locale==='zh'?'-- 选择对比模型 --':'-- Select to Compare --'}</option>
               {MODELS.map((mod,i) => i!==mainIdx ? <option key={i} value={i}>{mod.nm}</option> : null)}
             </select>
             {compareIdx >= 0 && (
               <span className="bg-indigo-50 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded text-xs cursor-pointer font-medium" onClick={()=>setCompareIdx(-1)}>
-                VS {MODELS[compareIdx].nm} · ✕ 取消
+                VS {MODELS[compareIdx].nm} · ✕ {locale==='zh'?'取消':'Cancel'}
               </span>
             )}
           </div>
 
           <div className="flex gap-5 items-start">
             {/* Left: Model List */}
-            <div className="w-[300px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[600px] overflow-y-auto">
-              <div className="px-5 py-3.5 text-sm font-bold text-gray-400 uppercase border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">全部模型 ({MODELS.length})</div>
+            <div className="w-[300px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[calc(100vh-180px)] overflow-y-auto">
+              <div className="px-5 py-3.5 text-sm font-bold text-gray-400 uppercase border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">{locale==='zh'?'全部模型':'All Models'} ({MODELS.length})</div>
               {MODELS.map((mod,i)=>(
                 <div
                   key={i}
@@ -156,15 +160,15 @@ export default function Home() {
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-7">
                 {isCmp ? (
                   <div>
-                    <div className="font-bold text-lg text-indigo-600 dark:text-indigo-400 mb-4">对比详情</div>
+                    <div className="font-bold text-lg text-indigo-600 dark:text-indigo-400 mb-4">{locale==='zh'?'对比详情':'Comparison'}</div>
                     <table className="w-full text-[15px]">
-                      <thead><tr className="text-gray-400 text-xs"><th className="text-left pb-2">维度</th><th className="text-right pb-2">{models[0].nm.split(' ')[0]}</th><th className="text-right pb-2">{models[1].nm.split(' ')[0]}</th></tr></thead>
+                      <thead><tr className="text-gray-400 text-xs"><th className="text-left pb-2">{locale==='zh'?'维度':'Dimension'}</th><th className="text-right pb-2">{models[0].nm.split(' ')[0]}</th><th className="text-right pb-2">{models[1].nm.split(' ')[0]}</th></tr></thead>
                       <tbody>
                         {DIMS.map(d=>{
                           const va=dim(models[0],d.k), vb=dim(models[1],d.k);
-                          return <tr key={d.k} className="border-t border-gray-50 dark:border-gray-700"><td className="py-2 text-gray-500">{d.l}</td><td className={`text-right py-2 font-semibold ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va}</td><td className={`text-right py-2 font-semibold ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb}</td></tr>;
+                          return <tr key={d.k} className="border-t border-gray-50 dark:border-gray-700"><td className="py-2 text-gray-500">{locale==='zh'?d.l:d.k}</td><td className={`text-right py-2 font-semibold ${va>vb?'text-red-600':vb>va?'text-green-600':''}`}>{va}</td><td className={`text-right py-2 font-semibold ${vb>va?'text-red-600':va>vb?'text-green-600':''}`}>{vb}</td></tr>;
                         })}
-                        <tr className="border-t-2 border-gray-200 dark:border-gray-600 font-extrabold"><td className="py-2">综合</td><td className={`text-right py-2 ${+avg(models[0])>+avg(models[1])?'text-red-600':'text-green-600'}`}>{avg(models[0])}</td><td className={`text-right py-2 ${+avg(models[1])>+avg(models[0])?'text-red-600':'text-green-600'}`}>{avg(models[1])}</td></tr>
+                        <tr className="border-t-2 border-gray-200 dark:border-gray-600 font-extrabold"><td className="py-2">{locale==='zh'?'综合':'Overall'}</td><td className={`text-right py-2 ${+avg(models[0])>+avg(models[1])?'text-red-600':'text-green-600'}`}>{avg(models[0])}</td><td className={`text-right py-2 ${+avg(models[1])>+avg(models[0])?'text-red-600':'text-green-600'}`}>{avg(models[1])}</td></tr>
                       </tbody>
                     </table>
                   </div>
@@ -172,7 +176,7 @@ export default function Home() {
                   <div>
                     <div className="text-center">
                       <div className="text-[56px] font-extrabold text-indigo-600 leading-none">{avg(m)}</div>
-                      <div className="text-sm text-gray-400 mt-1">综合评分 / 10</div>
+                      <div className="text-sm text-gray-400 mt-1">{locale==='zh'?'综合评分':'Overall Score'} / 10</div>
                       <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full mt-4 mb-4 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500" style={{width:(+avg(m)*10)+'%'}} />
                       </div>
