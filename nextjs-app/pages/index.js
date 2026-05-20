@@ -1,13 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { Radar } from 'react-chartjs-2';
-import { Chart, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import Nav from '../components/Nav';
+import RadarChart from '../components/RadarChart';
 import { getModelRatings } from '../lib/api';
 import { getLocale } from '../lib/i18n';
-
-Chart.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const DIMS = [
   {k:'reasoning',l:'推理能力'},{k:'chinese',l:'中文能力'},{k:'coding',l:'编程能力'},{k:'math',l:'数学能力'},
@@ -53,7 +50,10 @@ export default function Home() {
   const [locale, setLocale] = useState('en');
   const [apiModels, setApiModels] = useState(null);
 
-  useEffect(() => { setMounted(true); setLocale(getLocale()); getModelRatings().then(data => { if(data && data.length) setApiModels(data); }).catch(()=>{}); }, []);
+  useEffect(() => { 
+    setMounted(true); setLocale(getLocale());
+    getModelRatings().then(data => { if(data && data.length) setApiModels(data); }).catch(()=>{});
+  }, []);
 
   if (!mounted) return null;
 
@@ -145,7 +145,7 @@ export default function Home() {
                 {isCmp ? `${models[0].nm}  VS  ${models[1].nm}` : models[0].nm}
               </div>
               <div className="max-w-[700px] mx-auto">
-                <Radar data={chartData} options={{
+                <RadarChart data={chartData} options={{
                   responsive:true,
                   scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:15}},pointLabels:{font:{size:15,font:{weight:'bold'}}}}},
                   plugins:{legend:{display:isCmp,position:'bottom',labels:{font:{size:15},padding:28}}}
