@@ -1,13 +1,12 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-export default function RadarChart({ labels, datasets, options = {} }) {
+export default function RadarChart({ labels, datasets }) {
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -19,9 +18,8 @@ export default function RadarChart({ labels, datasets, options = {} }) {
         data: { labels, datasets },
         options: {
           responsive: true,
-          scales: { r: { beginAtZero: true, max: 10, ticks: { stepSize: 2, font: { size: 14 } }, pointLabels: { font: { size: 14 } } } },
-          plugins: { legend: { display: datasets.length > 1, position: 'bottom' } },
-          ...options,
+          scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 20, font: { size: 14 } }, pointLabels: { font: { size: 14 } } } },
+          plugins: { legend: { display: datasets.length > 1, position: 'bottom', labels: { font: { size: 14 } } } },
         },
       });
     };
@@ -34,9 +32,8 @@ export default function RadarChart({ labels, datasets, options = {} }) {
       script.onload = draw;
       document.head.appendChild(script);
     }
-
     return () => { if (chartRef.current) chartRef.current.destroy(); };
-  }, [labels, datasets, options]);
+  }, [labels, datasets]);
 
-  return <canvas ref={canvasRef} height={400} />;
+  return <canvas ref={canvasRef} height={420} />;
 }
