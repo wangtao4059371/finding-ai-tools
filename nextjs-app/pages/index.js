@@ -42,7 +42,7 @@ const MODELS = [
   {nm:"Kling 2.0（可灵）",co:"快手（中国）",pr:"算力点卡,官方API",ur:"https://kling.kuaishou.com",de:"快手的可灵AI 2.0把视频生成拉到了新高度。它不再只是文生视频工具，而是进化成了多模态创作平台。2.0版本通过改进的3D时空注意力机制，解决了AI视频人物变脸和场景跳帧的长期痛点。在运镜平滑度、大运动幅度肢体协调性和画面光影连续性上成熟度极高。可灵提供算力点卡计费和官方API接口，商业化门槛较低，特别适合搭建短视频自动化剪辑流水线，已在创作者社区中广泛采用。",re:8,ch:8.5,coding:3,ma:2.5,ha:7.8,sp:7.5,ap:7,ag:4.5,lt:3},
 ];
 
-function dim(m,k){return k==='reasoning'?m.re:k==='chinese'?m.ch:k==='coding'?m.coding:k==='math'?m.ma:k==='hallucination'?m.ha:k==='speed'?m.sp:k==='api_cost'?m.ap:k==='agent'?m.ag:k==='long_text'?m.lt:0}
+function dim(m,k){var v=m[k]; if(v!==undefined)return v;return k==='reasoning'?m.re:k==='chinese'?m.ch:k==='coding'?m.coding:k==='math'?m.ma:k==='hallucination'?m.ha:k==='speed'?m.sp:k==='api_cost'?m.ap:k==='agent'?m.ag:k==='long_text'?m.lt:0}
 function avg(m){return (DIMS.reduce((s,d)=>s+dim(m,d.k),0)/9).toFixed(1)}
 function fav(url){try{return 'https://www.google.com/s2/favicons?domain='+new URL(url).hostname+'&sz=32'}catch(e){return''}}
 
