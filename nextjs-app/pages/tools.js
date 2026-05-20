@@ -32,6 +32,9 @@ export default function Tools({ tools }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [locale, setLocale] = useState('en');
+  const [sortBy, setSortBy] = useState('default');
+  const [showBackTop, setShowBackTop] = useState(false);
   const firstVisit = useRef(true);
 
   useEffect(() => {
