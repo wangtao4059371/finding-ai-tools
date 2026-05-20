@@ -88,7 +88,7 @@ export default function Home() {
       </Head>
       <Nav />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-[1400px] mx-auto px-5 py-5">
+        <div className="max-w-[1600px] mx-auto px-6 py-6">
           <div className="text-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AI 大模型多维评分体系</h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">9 维度 × {MODELS.length} 款模型工程化评测 · 点击左侧切换模型 · 下拉选第二模型进行 1v1 对比</p>
@@ -114,18 +114,18 @@ export default function Home() {
 
           <div className="flex gap-5 items-start">
             {/* Left: Model List */}
-            <div className="w-[260px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[550px] overflow-y-auto">
-              <div className="px-4 py-3 text-xs font-bold text-gray-400 uppercase border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">全部模型 ({MODELS.length})</div>
+            <div className="w-[300px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[600px] overflow-y-auto">
+              <div className="px-5 py-3.5 text-sm font-bold text-gray-400 uppercase border-b border-gray-50 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">全部模型 ({MODELS.length})</div>
               {MODELS.map((mod,i)=>(
                 <div
                   key={i}
                   onClick={()=>{setMainIdx(i);setCompareIdx(-1)}}
-                  className={`flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm border-b border-gray-50 dark:border-gray-700 transition-colors ${
+                  className={`flex items-center gap-3 px-5 py-3 cursor-pointer text-[15px] border-b border-gray-50 dark:border-gray-700 transition-colors ${
                     i===mainIdx
-                      ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold border-l-[3px] border-l-indigo-600 pl-[13px]'
+                      ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold border-l-[3px] border-l-indigo-600 pl-[17px]'
                       : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                 >
-                  <img src={fav(mod.ur)} className="w-[18px] h-[18px] rounded flex-shrink-0" alt="" onError={e=>e.target.style.display='none'} />
+                  <img src={fav(mod.ur)} className="w-[22px] h-[22px] rounded flex-shrink-0" alt="" onError={e=>e.target.style.display='none'} />
                   <span className="truncate flex-1">{mod.nm}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">{avg(mod)}</span>
                 </div>
@@ -137,11 +137,11 @@ export default function Home() {
               <div className="text-center font-bold text-lg mb-3 text-gray-900 dark:text-gray-100">
                 {isCmp ? `${models[0].nm}  VS  ${models[1].nm}` : models[0].nm}
               </div>
-              <div className="max-w-[480px] mx-auto">
+              <div className="max-w-[560px] mx-auto">
                 <Radar data={chartData} options={{
                   responsive:true,
-                  scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:12}},pointLabels:{font:{size:12,font:{weight:'bold'}}}}},
-                  plugins:{legend:{display:isCmp,position:'bottom',labels:{font:{size:13},padding:20}}}
+                  scales:{r:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:14}},pointLabels:{font:{size:14,font:{weight:'bold'}}}}},
+                  plugins:{legend:{display:isCmp,position:'bottom',labels:{font:{size:14},padding:24}}}
                 }} />
               </div>
               <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
@@ -152,12 +152,12 @@ export default function Home() {
             </div>
 
             {/* Right: Info */}
-            <div className="w-[300px] flex-shrink-0">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="w-[340px] flex-shrink-0">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-7">
                 {isCmp ? (
                   <div>
-                    <div className="font-bold text-base text-indigo-600 dark:text-indigo-400 mb-3">对比详情</div>
-                    <table className="w-full text-sm">
+                    <div className="font-bold text-lg text-indigo-600 dark:text-indigo-400 mb-4">对比详情</div>
+                    <table className="w-full text-[15px]">
                       <thead><tr className="text-gray-400 text-xs"><th className="text-left pb-2">维度</th><th className="text-right pb-2">{models[0].nm.split(' ')[0]}</th><th className="text-right pb-2">{models[1].nm.split(' ')[0]}</th></tr></thead>
                       <tbody>
                         {DIMS.map(d=>{
@@ -171,15 +171,15 @@ export default function Home() {
                 ) : (
                   <div>
                     <div className="text-center">
-                      <div className="text-[46px] font-extrabold text-indigo-600 leading-none">{avg(m)}</div>
-                      <div className="text-xs text-gray-400 mt-1">综合评分 / 10</div>
-                      <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full mt-3 mb-3 overflow-hidden">
+                      <div className="text-[56px] font-extrabold text-indigo-600 leading-none">{avg(m)}</div>
+                      <div className="text-sm text-gray-400 mt-1">综合评分 / 10</div>
+                      <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full mt-4 mb-4 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500" style={{width:(+avg(m)*10)+'%'}} />
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-3 mb-2"><strong className="text-gray-700 dark:text-gray-300">{m.co}</strong> · {m.pr}</div>
-                    <div className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-750 rounded-lg p-3.5 mb-4">{m.de}</div>
-                    <a href={m.ur} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                    <div className="text-sm text-gray-500 mt-4 mb-3"><strong className="text-gray-700 dark:text-gray-300">{m.co}</strong> · {m.pr}</div>
+                    <div className="text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-750 rounded-lg p-4 mb-5">{m.de}</div>
+                    <a href={m.ur} target="_blank" rel="noopener noreferrer" className="block w-full text-center py-3.5 bg-indigo-600 text-white rounded-lg text-base font-semibold hover:bg-indigo-700 transition-colors">
                       🌐 {locale==='zh'?'访问官网':'Visit Website'}
                     </a>
                   </div>
