@@ -168,6 +168,62 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        {/* Data Attribution */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 mb-6 text-xs text-gray-500 dark:text-gray-400 leading-relaxed text-center">
+          <p>
+            {locale==='zh' ? '数据来源：' : 'Data Source: '}
+            <a href="https://www.superclueai.com" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">SuperCLUE (superclueai.com)</a>
+            &nbsp;·&nbsp;
+            {locale==='zh' ? '测评日期：2026年3月-4月' : 'Benchmark Date: March-April 2026'}
+          </p>
+          <p className="mt-1">
+            {locale==='zh' ? '鸣谢 SuperCLUE 团队为中文大模型评测所做的贡献。' : 'Thanks to the SuperCLUE team for their contributions to Chinese LLM evaluation.'}
+          </p>
+          <p className="mt-1">
+            {locale==='zh' ? '如涉及版权或侵权问题，请联系管理员：' : 'For copyright concerns, contact: '}
+            <a href="mailto:wangtao4059371@gmail.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">wangtao4059371@gmail.com</a>
+          </p>
+        </div>
+
+        {/* Footer */}
+        <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 py-8">
+          <div className="max-w-[1400px] mx-auto px-5 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale==='zh'?'关于我们':'About'}</h4>
+              <ul className="space-y-1">
+                <li><a href="/about" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'关于':'About'}</a></li>
+                <li><a href="/contact" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'联系我们':'Contact'}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale==='zh'?'法律条款':'Legal'}</h4>
+              <ul className="space-y-1">
+                <li><a href="/privacy-policy" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'隐私政策':'Privacy Policy'}</a></li>
+                <li><a href="/terms" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'服务条款':'Terms'}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale==='zh'?'分类':'Categories'}</h4>
+              <ul className="space-y-1">
+                <li><a href="/tools" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'大模型AI':'AI Models'}</a></li>
+                <li><a href="/tools" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'AI音频/音乐':'AI Music'}</a></li>
+                <li><a href="/tools" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'AI学习资源':'AI Learning'}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale==='zh'?'热门工具':'Popular'}</h4>
+              <ul className="space-y-1">
+                <li><a href="/tool/chatgpt" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">ChatGPT</a></li>
+                <li><a href="/tool/deepseek" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">DeepSeek</a></li>
+                <li><a href="/tool/claude" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">Claude</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="max-w-[1400px] mx-auto px-5 mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 text-center text-gray-400 text-xs">
+            © 2026 Finding AI Tools
+          </div>
+        </footer>
       </div>
     </div>
   </>);
