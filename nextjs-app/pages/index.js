@@ -43,31 +43,35 @@ const sortedByTotal = [...MODELS].sort((a,b)=>b.total-a.total);
 const fav=(url)=>{try{return'https://www.google.com/s2/favicons?domain='+new URL(url).hostname+'&sz=32'}catch(e){return''}};
 const L=({mod,s})=><img loading="lazy" src={fav(mod.ur)} style={{width:s||20,height:s||20,borderRadius:3,flexShrink:0}} alt="" onError={e=>e.target.style.display='none'}/>;
 
-function BarChart({title,data,height=300,onClick,locale}){
+function BarChart({title,data,height=300,onClick}){
   const maxVal = Math.max(...data.map(d=>d.v));
   const ticks = [0,20,40,60,80,100];
   return(
-    <div className="relative" style={{height:height+60,overflow:'visible'}}>
+    <div style={{height:height+70,overflow:'visible'}}>
       {title&&<h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">{title}</h4>}
       <div className="relative" style={{height,overflow:'visible'}}>
+        {/* Grid lines behind bars */}
         {ticks.map(t=>(
-          <div key={t} className="absolute left-0 right-0 border-t border-gray-100 dark:border-gray-700" style={{bottom:(t/100*height)+'px'}}>
-            <span className="absolute -left-8 top-1/2 -translate-y-1/2 text-[9px] text-gray-400">{t}</span>
+          <div key={t} className="absolute left-0 right-0 border-t border-gray-100/50 dark:border-gray-600/30" style={{bottom:(t/100*height)+'px'}}>
+            <span className="absolute -left-8 top-1/2 -translate-y-1/2 text-[9px] text-gray-300 dark:text-gray-600">{t}</span>
           </div>
         ))}
-        <div className="flex items-end gap-[2px] h-full ml-8">
+        {/* Bars above grid */}
+        <div className="flex items-end gap-[2px] h-full ml-8 relative z-10">
           {data.map((d,i)=>(
             <div key={i} className="flex flex-col items-center justify-end h-full cursor-pointer group flex-shrink-0" style={{width:(90/data.length)+'%'}} onClick={()=>onClick(d.idx)}>
+              <span className="text-[8px] text-gray-500 font-semibold mb-0.5">{d.v.toFixed(0)}</span>
               <div className="w-[55%] rounded-t transition-all group-hover:opacity-80" style={{height:(d.v/100*height)+'px',backgroundColor:COLORS[d.idx%COLORS.length],minHeight:2}}/>
             </div>
           ))}
         </div>
       </div>
+      {/* Labels below */}
       <div className="flex gap-[2px] ml-8 mt-1">
         {data.map((d,i)=>(
           <div key={i} className="flex flex-col items-center flex-shrink-0" style={{width:(90/data.length)+'%'}}>
-            <div className="flex items-center gap-0.5 mb-0.5"><L mod={MODELS[d.idx]} s={10}/></div>
-            <span className="text-[7px] text-gray-500 leading-tight text-center" style={{writingMode:'vertical-rl',maxHeight:50}}>{MODELS[d.idx].nm.split(' ')[0]}</span>
+            <L mod={MODELS[d.idx]} s={10}/>
+            <span className="text-[7px] text-gray-400 leading-tight text-center" style={{writingMode:'vertical-rl',maxHeight:50}}>{MODELS[d.idx].nm.split(' ')[0]}</span>
           </div>
         ))}
       </div>
@@ -113,7 +117,7 @@ export default function Home() {
             {compareIdx>=0&&<span className="text-xs text-indigo-600 cursor-pointer" onClick={()=>setCompareIdx(-1)}>VS {MODELS[compareIdx].nm} ✕</span>}
           </div>
           <div className="flex flex-col xl:flex-row gap-5 items-start">
-            <div className="w-full xl:w-[280px] flex-shrink-0 bg-gray-50 dark:bg-gray-750 rounded-xl border overflow-hidden max-h-[300px] xl:max-h-[500px] overflow-y-auto">
+            <div className="w-full xl:w-[280px] flex-shrink-0 bg-gray-50 dark:bg-gray-750 rounded-xl border overflow-hidden max-h-[400px] xl:max-h-[600px] overflow-y-auto">
               <div className="px-4 py-3 text-sm font-bold text-gray-400 uppercase border-b sticky top-0 bg-gray-50 dark:bg-gray-750">{t('模型')} ({MODELS.length})</div>
               {MODELS.map((mod,i)=>(<div key={i} onClick={()=>{setMainIdx(i);setCompareIdx(-1)}} className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 transition-colors ${i===mainIdx?'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 font-bold':'hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
                 <L mod={mod}/><span className="truncate flex-1">{mod.nm}</span><span className="text-xs px-2 py-0.5 rounded-full bg-white dark:bg-gray-700 text-gray-500">{mod.total.toFixed(1)}</span>
@@ -153,14 +157,14 @@ export default function Home() {
         {/* Total Score Chart */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">{t('总分排名')}</h3>
-          <BarChart data={sortedByTotal.map((mod,i)=>({idx:MODELS.indexOf(mod),v:mod.total}))} height={300} onClick={setMainIdx} locale={locale}/>
+          <BarChart data={sortedByTotal.map((mod,i)=>({idx:MODELS.indexOf(mod),v:mod.total}))} height={300} onClick={setMainIdx}/>
         </div>
 
         {/* Dimension Charts */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {DIMS.map(d=>(
             <div key={d.k} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
-              <BarChart title={dimT(d)} data={[...MODELS].sort((a,b)=>getDim(b,d.k)-getDim(a,d.k)).slice(0,12).map(mod=>({idx:MODELS.indexOf(mod),v:getDim(mod,d.k)}))} height={180} onClick={(i)=>{const idx=MODELS.indexOf(MODELS.sort((a,b)=>getDim(b,d.k)-getDim(a,d.k))[i]);if(idx>=0)setMainIdx(idx)}} locale={locale}/>
+              <BarChart title={dimT(d)} data={[...MODELS].sort((a,b)=>getDim(b,d.k)-getDim(a,d.k)).slice(0,12).map(mod=>({idx:MODELS.indexOf(mod),v:getDim(mod,d.k)}))} height={180} onClick={(i)=>{const idx=MODELS.indexOf(MODELS.sort((a,b)=>getDim(b,d.k)-getDim(a,d.k))[i]);if(idx>=0)setMainIdx(idx)}}/>
             </div>
           ))}
         </div>
