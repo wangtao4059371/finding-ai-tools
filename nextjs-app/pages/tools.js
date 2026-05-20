@@ -147,7 +147,7 @@ export default function Tools({ tools }) {
               ))}
               <span className="text-gray-300 dark:text-gray-600">|</span>
               {['Agent','Tool'].map(t => (
-                <button key={t} onClick={() => setSearchQuery(t); setPage(1);}
+                <button key={t} onClick={() => { setSearchQuery(t); setPage(1); }}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${searchQuery===t?'bg-indigo-600 text-white':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
                   {t}
                 </button>
