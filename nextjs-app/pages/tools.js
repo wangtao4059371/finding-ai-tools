@@ -68,7 +68,7 @@ export default function Tools({ tools }) {
   // 排序
   if (sortBy === 'name') {
     filteredTools = [...filteredTools].sort((a, b) => a.name.localeCompare(b.name));
-  } else if (sortBy === 'popular') {
+  } else if (sortBy === 'latest') {
     filteredTools = [...filteredTools].sort((a, b) => b.id - a.id);
   }
 
@@ -166,7 +166,7 @@ export default function Tools({ tools }) {
                 className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm"
               >
                 <option value="default">{locale === 'zh' ? '默认排序' : 'Default'}</option>
-                <option value="popular">{locale === 'zh' ? '最新收录' : 'Latest'}</option>
+                <option value="latest">{locale === 'zh' ? '最新收录' : 'Latest'}</option>
                 <option value="name">{locale === 'zh' ? '名称 A-Z' : 'Name A-Z'}</option>
               </select>
             </div>
@@ -200,7 +200,7 @@ export default function Tools({ tools }) {
             <h3 className="font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-xs mb-3">
               {t('categories')}
             </h3>
-            <FilterTags tags={tags} activeTag={activeTag} onFilter={(tag) => { setActiveTag(tag); setPage(1); }} />
+            <FilterTags tags={tags} activeTag={activeTag} onFilter={(tag) => { setActiveTag(tag); setPage(1); }} locale={locale} />
           </aside>
 
           <section className="flex-1">
@@ -272,9 +272,9 @@ export default function Tools({ tools }) {
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale === 'zh' ? '分类' : 'Categories'}</h4>
               <ul className="space-y-1">
-                <li><a href="/?tag=大模型AI" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? '大模型AI' : 'AI Models'}</a></li>
-                <li><a href="/?tag=AI音频/音乐" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? 'AI音频/音乐' : 'AI Music'}</a></li>
-                <li><a href="/?tag=AI学习资源" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? 'AI学习资源' : 'Learning'}</a></li>
+                <li><a href="/tools?tag=大模型AI" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? '大模型AI' : 'AI Models'}</a></li>
+                <li><a href="/tools?tag=AI音频/音乐" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? 'AI音频/音乐' : 'AI Music'}</a></li>
+                <li><a href="/tools?tag=AI学习资源" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale === 'zh' ? 'AI学习资源' : 'Learning'}</a></li>
               </ul>
             </div>
             <div>

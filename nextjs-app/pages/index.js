@@ -206,9 +206,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{locale==='zh'?'分类':'Categories'}</h4>
               <ul className="space-y-1">
-                <li><a href="/tools" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'大模型AI':'AI Models'}</a></li>
-                <li><a href="/tools" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'AI音频/音乐':'AI Music'}</a></li>
-                <li><a href="/tools" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'AI学习资源':'AI Learning'}</a></li>
+                <li><a href="/tools" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600">{locale==='zh'?'全部工具':'All Tools'}</a></li>
               </ul>
             </div>
             <div>

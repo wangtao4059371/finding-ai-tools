@@ -1,4 +1,4 @@
-export default function FilterTags({ tags, activeTag, onFilter }) {
+export default function FilterTags({ tags, activeTag, onFilter, locale }) {
   return (
     <div className="flex flex-row md:flex-col gap-2 overflow-x-auto pb-2">
       {tags.map(tag => (
@@ -11,7 +11,7 @@ export default function FilterTags({ tags, activeTag, onFilter }) {
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
         >
-          {tag === '全部' ? '全部收录' : tag}
+          {tag === '全部' ? (locale === 'zh' ? '全部收录' : 'All') : tag}
         </button>
       ))}
     </div>

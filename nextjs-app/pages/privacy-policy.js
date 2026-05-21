@@ -1,41 +1,35 @@
 import Head from 'next/head';
+import Nav from '../components/Nav';
+import { getLocale } from '../lib/i18n';
 
-export default function PrivacyPolicy() {
+export default function Privacy() {
+  const locale = getLocale();
+  const t = (zh, en) => locale === 'zh' ? zh : en;
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
-          <a href="/" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">Finding AI Tools</a>
-        </div>
-      </header>
-      <main className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Privacy Policy</h1>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
-          <p><strong>Last Updated:</strong> May 2026</p>
-          
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">1. Information We Collect</h2>
-          <p>We do not collect any personal information from visitors. We do not require registration, and we do not store any user data on our servers.</p>
-          
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">2. Cookies and Tracking</h2>
-          <p>We use Google Analytics to understand website traffic and usage patterns. Google Analytics may use cookies to collect anonymous usage data. You can opt out of Google Analytics tracking by using the Google Analytics Opt-out Browser Add-on.</p>
-          <p>We also use Google AdSense to display advertisements. Google AdSense may use cookies to serve personalized ads based on your browsing history. You can opt out of personalized advertising by visiting Google's Ads Settings.</p>
-          
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">3. Third-Party Services</h2>
-          <p>Our website contains links to third-party websites and services. We are not responsible for the privacy practices or content of these external sites. We encourage you to review their privacy policies before providing any personal information.</p>
-          
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">4. Data Security</h2>
-          <p>We implement reasonable security measures to protect the integrity of our website. However, no method of transmission over the Internet is 100% secure.</p>
-          
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">5. Children's Privacy</h2>
-          <p>Our website is not directed at children under 13 years of age. We do not knowingly collect personal information from children.</p>
-          
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">6. Changes to This Policy</h2>
-          <p>We may update this privacy policy from time to time. Changes will be posted on this page with an updated revision date.</p>
-          
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-6">7. Contact</h2>
-          <p>If you have any questions about this privacy policy, please contact us at <a href="mailto:wangtao4059371@gmail.com" className="text-indigo-600 hover:underline">wangtao4059371@gmail.com</a>.</p>
-        </div>
-      </main>
-    </div>
+    <>
+      <Head>
+        <title>{t('隐私政策 - AI 智能指数', 'Privacy Policy - Finding AI Tools')}</title>
+        <meta name="robots" content="index,follow" />
+      </Head>
+      <Nav />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <header className="bg-white dark:bg-gray-800 shadow-sm"><div className="max-w-3xl mx-auto px-4 py-4" /></header>
+        <main className="max-w-3xl mx-auto px-4 py-12">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">{t('隐私政策','Privacy Policy')}</h1>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border space-y-4 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p><strong>{t('最后更新：2026年5月','Last Updated: May 2026')}</strong></p>
+            <h2 className="text-xl font-bold mt-6">{t('1. 信息收集','1. Information Collection')}</h2>
+            <p>{t('我们不收集任何个人信息，无需注册即可使用本网站。','We do not collect personal information. No registration required.')}</p>
+            <h2 className="text-xl font-bold mt-6">{t('2. Cookie与追踪','2. Cookies & Tracking')}</h2>
+            <p>{t('我们使用Google Analytics和Google AdSense来分析流量和展示广告。这些服务可能使用Cookie。您可以通过浏览器设置选择退出。','We use Google Analytics and Google AdSense for traffic analysis and advertising. These services may use cookies. You can opt out via browser settings.')}</p>
+            <h2 className="text-xl font-bold mt-6">{t('3. 第三方服务','3. Third-Party Services')}</h2>
+            <p>{t('本网站包含第三方链接，请阅读其隐私政策。','This site contains third-party links. Please review their privacy policies.')}</p>
+            <h2 className="text-xl font-bold mt-6">{t('4. 联系我们','4. Contact')}</h2>
+            <p><a href="mailto:wangtao4059371@gmail.com" className="text-indigo-600">wangtao4059371@gmail.com</a></p>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }
