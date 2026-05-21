@@ -179,13 +179,8 @@ export default function Tools({ tools }) {
             </div>
           </div>
         </section>
-                <div className="text-indigo-200 text-sm">{locale === 'zh' ? '分类' : 'Categories'}</div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Featured Tools + AI Recommend */}
+        {/* Featured Tools */}
         <section className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1">
