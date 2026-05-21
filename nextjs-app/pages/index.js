@@ -6,6 +6,17 @@ import Nav from '../components/Nav';
 import ToolCard from '../components/ToolCard';
 import FilterTags from '../components/FilterTags';
 
+const MODEL_LOGOS = [
+  "https://claude.ai","https://deepmind.google","https://openai.com","https://www.volcengine.com",
+  "https://www.deepseek.com","https://deepmind.google","https://www.deepseek.com","https://x.ai",
+  "https://kimi.moonshot.cn","https://tongyi.aliyun.com","https://www.zhipuai.cn","https://www.deepseek.com",
+  "https://www.mi.com","https://cloud.tencent.com","https://tongyi.aliyun.com","https://www.meituan.com",
+  "https://github.com/openai","https://www.stepfun.com","https://www.minimax.io","https://www.minimax.io",
+  "https://xinghuo.xfyun.cn","https://www.mi.com","https://mistral.ai","https://llama.meta.com",
+];
+
+const favicon = (url) => 'https://www.google.com/s2/favicons?domain=' + new URL(url).hostname + '&sz=32';
+
 const PAGE_SIZE = 12;
 
 function SkeletonCard() {
@@ -94,40 +105,80 @@ export default function Tools({ tools }) {
       <Nav />
 
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 dark:from-indigo-900 dark:via-purple-900 dark:to-pink-900 py-16">
-          <div className="max-w-7xl mx-auto px-4 text-center text-white">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              {locale === 'zh' ? '发现最佳 AI 工具' : 'Discover the Best AI Tools'}
+        <a href="/ratings" className="block bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-950 py-12 md:py-16 border-b border-indigo-900/30 cursor-pointer group">
+          <div className="max-w-5xl mx-auto px-4">
+            {/* Title */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-white mb-3 tracking-tight">
+              {locale === 'zh' ? '热门 24 款 AI 大模型评测排名' : 'Top 24 AI Model Rankings'}
             </h1>
-            <p className="text-lg sm:text-xl text-indigo-100 max-w-2xl mx-auto mb-6">
-              {locale === 'zh' 
-                ? '一站式导航平台，收录全球 AI 模型、智能体、创作工具，帮你快速找到需要的 AI 解决方案。'
-                : 'Your one-stop directory for AI models, agents, and creative tools. Find the perfect AI solution for your needs.'}
-            </p>
 
-            {/* Ratings Promo Banner */}
-            <a href="/ratings" className="inline-block bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-2xl px-6 py-4 border border-white/20 transition-all hover:scale-[1.02] max-w-xl mx-auto">
-              <div className="flex items-center gap-4 text-left">
-                <div className="text-4xl">📊</div>
-                <div>
-                  <div className="font-bold text-lg text-white">
-                    {locale === 'zh' ? 'AI 智能指数 — SuperCLUE 大模型评测排名' : 'AI Intelligence Index — SuperCLUE Model Rankings'}
-                  </div>
-                  <p className="text-sm text-indigo-100 mt-1">
-                    {locale === 'zh' ? '24款主流模型 · 6维度评分 · 总分柱状图 · 雷达对比' : '24 leading models · 6-dimension ratings · Charts & comparison'}
-                  </p>
+            {/* Logo Row */}
+            <div className="flex justify-center flex-wrap gap-1.5 mb-6 max-w-3xl mx-auto">
+              {MODEL_LOGOS.map((url,i)=>(
+                <img key={i} loading="lazy" src={favicon(url)} className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-white/10 p-0.5 hover:bg-white/30 transition-all hover:scale-110" alt="" onError={e=>e.target.style.display='none'} />
+              ))}
+            </div>
+
+            {/* Chart Previews Row */}
+            <div className="flex flex-col md:flex-row gap-4 mb-6 max-w-3xl mx-auto">
+              {/* Radar Preview */}
+              <div className="flex-1 bg-white/5 backdrop-blur rounded-xl p-4 border border-white/10">
+                <div className="text-xs text-indigo-300 font-semibold mb-2 text-center">📡 {locale==='zh'?'多维雷达对比':'Radar Comparison'}</div>
+                <div className="flex justify-center">
+                  <svg width="120" height="120" viewBox="0 0 120 120">
+                    <polygon points="60,10 95,35 95,85 60,110 25,85 25,35" fill="rgba(99,102,241,0.2)" stroke="rgba(99,102,241,0.8)" strokeWidth="1.5"/>
+                    <polygon points="60,20 88,38 88,82 60,100 32,82 32,38" fill="rgba(239,68,68,0.15)" stroke="rgba(239,68,68,0.7)" strokeWidth="1.5"/>
+                    <circle cx="60" cy="60" r="2" fill="#6366f1"/>
+                    <circle cx="88" cy="38" r="2" fill="#6366f1"/>
+                    <circle cx="88" cy="82" r="2" fill="#6366f1"/>
+                    <circle cx="60" cy="100" r="2" fill="#6366f1"/>
+                    <circle cx="32" cy="82" r="2" fill="#6366f1"/>
+                    <circle cx="32" cy="38" r="2" fill="#6366f1"/>
+                  </svg>
                 </div>
               </div>
-            </a>
-
-            {/* Stats */}
-            <div className="flex justify-center gap-8 mt-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold">{toolCount}+</div>
-                <div className="text-indigo-200 text-sm">{locale === 'zh' ? '收录工具' : 'Tools'}</div>
+              {/* Bar Preview */}
+              <div className="flex-1 bg-white/5 backdrop-blur rounded-xl p-4 border border-white/10">
+                <div className="text-xs text-indigo-300 font-semibold mb-2 text-center">📊 {locale==='zh'?'总分排名':'Total Score Ranking'}</div>
+                <div className="flex items-end gap-0.5 h-[100px] justify-center">
+                  {[72,67,64,60,56,52,50,42,37].map((h,i)=>(
+                    <div key={i} className="w-[8%] rounded-t transition-all" style={{height:h+'%',background:`hsl(${260-i*15},70%,${50+i*3}%)`,minHeight:2}}/>
+                  ))}
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold">{categoryCount}+</div>
+            </div>
+
+            {/* Sub Info + CTA */}
+            <div className="text-center">
+              <p className="text-sm text-indigo-200/80 mb-1">
+                {locale==='zh' 
+                  ? '6 维度评测：数学推理 · 幻觉控制 · 科学推理 · 指令遵循 · 代码生成 · 智能体'
+                  : '6 dimensions: Math · Hallucination · Science · Instruction · Coding · Agent'}
+              </p>
+              <p className="text-xs text-indigo-300/60 mb-4">
+                {locale==='zh' ? '数据来源：SuperCLUE 中文大模型评测基准 (2026.3)' : 'Source: SuperCLUE Chinese LLM Benchmark (March 2026)'}
+              </p>
+              <span className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-full font-bold text-base transition-all group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-indigo-500/30">
+                {locale==='zh' ? '点击查看完整排名' : 'View Full Rankings'}
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        {/* Stats */}
+        <section className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 py-6">
+          <div className="max-w-7xl mx-auto px-4 flex justify-center gap-8 md:gap-12">
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-indigo-600">{toolCount}+</div>
+              <div className="text-sm text-gray-500">{locale === 'zh' ? '收录工具' : 'Tools'}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-indigo-600">{categoryCount}+</div>
+              <div className="text-sm text-gray-500">{locale === 'zh' ? '分类' : 'Categories'}</div>
+            </div>
+          </div>
+        </section>
                 <div className="text-indigo-200 text-sm">{locale === 'zh' ? '分类' : 'Categories'}</div>
               </div>
             </div>
