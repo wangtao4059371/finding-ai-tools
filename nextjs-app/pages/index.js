@@ -6,16 +6,33 @@ import Nav from '../components/Nav';
 import ToolCard from '../components/ToolCard';
 import FilterTags from '../components/FilterTags';
 
-const MODEL_LOGOS = [
-  "https://claude.ai","https://deepmind.google","https://openai.com","https://www.volcengine.com",
-  "https://www.deepseek.com","https://deepmind.google","https://www.deepseek.com","https://x.ai",
-  "https://kimi.moonshot.cn","https://tongyi.aliyun.com","https://www.zhipuai.cn","https://www.deepseek.com",
-  "https://www.mi.com","https://cloud.tencent.com","https://tongyi.aliyun.com","https://www.meituan.com",
-  "https://github.com/openai","https://www.stepfun.com","https://www.minimax.io","https://www.minimax.io",
-  "https://xinghuo.xfyun.cn","https://www.mi.com","https://mistral.ai","https://llama.meta.com",
+const MODEL_DATA = [
+  {nm:"Claude",ur:"https://claude.ai",total:77.02,math:85.71,hallucination:82.95,science:85.37,instruction:47.57,coding:71.15,agent:89.35},
+  {nm:"Gemini",ur:"https://deepmind.google",total:76.69,math:92.44,hallucination:80.5,science:81.71,instruction:56.76,coding:69.78,agent:78.96},
+  {nm:"GPT-5.4",ur:"https://openai.com",total:72.48},
+  {nm:"Doubao",ur:"https://www.volcengine.com",total:71.53},
+  {nm:"DeepSeek",ur:"https://www.deepseek.com",total:70.98},
+  {nm:"Kimi",ur:"https://kimi.moonshot.cn",total:64.6},
+  {nm:"Qwen",ur:"https://tongyi.aliyun.com",total:64.48},
+  {nm:"GLM-5",ur:"https://www.zhipuai.cn",total:64.27},
+  {nm:"Llama",ur:"https://llama.meta.com",total:36.7},
 ];
 
-const favicon = (url) => 'https://www.google.com/s2/favicons?domain=' + new URL(url).hostname + '&sz=32';
+const DIMS6 = ['math','hallucination','science','instruction','coding','agent'];
+const getD = (m,k) => m[k] || 0;
+const favicon = (url) => {try{return'https://www.google.com/s2/favicons?domain='+new URL(url).hostname+'&sz=32'}catch(e){return''}};
+
+// SVG radar point helpers
+const points = (r,s,cx,cy) => Array.from({length:s},(_,i)=>{
+  const a = -Math.PI/2 + (2*Math.PI*i)/s;
+  return `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`;
+}).join(' ');
+const px = (i,r,cx,cy) => {const a=-Math.PI/2+(2*Math.PI*i)/6;return cx+r*Math.cos(a)};
+const py = (i,r,cx,cy) => {const a=-Math.PI/2+(2*Math.PI*i)/6;return cy+r*Math.sin(a)};
+const pt = (mi,cx,cy) => DIMS6.map((k,i)=>{
+  const r = getD(MODEL_DATA[mi],k)/100*90;
+  return `${px(i,r,cx,cy)},${py(i,r,cx,cy)}`;
+}).join(' ');
 
 const PAGE_SIZE = 12;
 
@@ -114,35 +131,47 @@ export default function Tools({ tools }) {
 
             {/* Logo Row */}
             <div className="flex justify-center flex-wrap gap-1.5 mb-6 max-w-3xl mx-auto">
-              {MODEL_LOGOS.map((url,i)=>(
-                <img key={i} loading="lazy" src={favicon(url)} className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-white/10 p-0.5 hover:bg-white/30 transition-all hover:scale-110" alt="" onError={e=>e.target.style.display='none'} />
+              {MODEL_DATA.map((mod,i)=>(
+                <img key={i} loading="lazy" src={favicon(mod.ur)} className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-white/10 p-0.5 hover:bg-white/30 transition-all hover:scale-110" alt={mod.nm} onError={e=>e.target.style.display='none'} title={mod.nm} />
               ))}
             </div>
 
             {/* Chart Previews Row */}
             <div className="flex flex-col md:flex-row gap-4 mb-6 max-w-3xl mx-auto">
-              {/* Radar Preview */}
+              {/* Real Radar: Claude vs Gemini */}
               <div className="flex-1 bg-white/5 backdrop-blur rounded-xl p-4 border border-white/10">
-                <div className="text-xs text-indigo-300 font-semibold mb-2 text-center">📡 {locale==='zh'?'多维雷达对比':'Radar Comparison'}</div>
+                <div className="text-xs text-indigo-300 font-semibold mb-2 text-center">
+                  📡 {locale==='zh'?'Claude vs Gemini 雷达对比':'Claude vs Gemini Radar'}
+                </div>
                 <div className="flex justify-center">
-                  <svg width="120" height="120" viewBox="0 0 120 120">
-                    <polygon points="60,10 95,35 95,85 60,110 25,85 25,35" fill="rgba(99,102,241,0.2)" stroke="rgba(99,102,241,0.8)" strokeWidth="1.5"/>
-                    <polygon points="60,20 88,38 88,82 60,100 32,82 32,38" fill="rgba(239,68,68,0.15)" stroke="rgba(239,68,68,0.7)" strokeWidth="1.5"/>
-                    <circle cx="60" cy="60" r="2" fill="#6366f1"/>
-                    <circle cx="88" cy="38" r="2" fill="#6366f1"/>
-                    <circle cx="88" cy="82" r="2" fill="#6366f1"/>
-                    <circle cx="60" cy="100" r="2" fill="#6366f1"/>
-                    <circle cx="32" cy="82" r="2" fill="#6366f1"/>
-                    <circle cx="32" cy="38" r="2" fill="#6366f1"/>
+                  <svg width="140" height="140" viewBox="0 0 200 200">
+                    {/* Grid */}
+                    {[0,33,66,100].map(r => (
+                      <polygon key={r} points={points(r,6,100,100)} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
+                    ))}
+                    {[0,1,2,3,4,5].map(i => (
+                      <line key={i} x1="100" y1="100" x2={px(i,100,100,100)} y2={py(i,100,100,100)} stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
+                    ))}
+                    {/* Claude (indigo) */}
+                    <polygon points={pt(0,100,100)} fill="rgba(99,102,241,0.25)" stroke="#818cf8" strokeWidth="1.5"/>
+                    {/* Gemini (red) */}
+                    <polygon points={pt(1,100,100)} fill="rgba(239,68,68,0.2)" stroke="#f87171" strokeWidth="1.5"/>
+                    {/* Legend */}
+                    <circle cx="160" cy="20" r="3" fill="#818cf8"/><text x="167" y="23" fill="#c7d2fe" fontSize="8">Claude</text>
+                    <circle cx="160" cy="34" r="3" fill="#f87171"/><text x="167" y="37" fill="#fecaca" fontSize="8">Gemini</text>
                   </svg>
                 </div>
               </div>
-              {/* Bar Preview */}
+              {/* Real Bar Chart */}
               <div className="flex-1 bg-white/5 backdrop-blur rounded-xl p-4 border border-white/10">
-                <div className="text-xs text-indigo-300 font-semibold mb-2 text-center">📊 {locale==='zh'?'总分排名':'Total Score Ranking'}</div>
-                <div className="flex items-end gap-0.5 h-[100px] justify-center">
-                  {[72,67,64,60,56,52,50,42,37].map((h,i)=>(
-                    <div key={i} className="w-[8%] rounded-t transition-all" style={{height:h+'%',background:`hsl(${260-i*15},70%,${50+i*3}%)`,minHeight:2}}/>
+                <div className="text-xs text-indigo-300 font-semibold mb-2 text-center">📊 {locale==='zh'?'总分排名榜':'Total Score Ranking'}</div>
+                <div className="flex items-end gap-1 h-[110px] justify-center">
+                  {MODEL_DATA.slice(0,9).map((m,i)=>(
+                    <div key={i} className="flex flex-col items-center justify-end h-full">
+                      <span className="text-[8px] text-indigo-200/70 mb-0.5">{m.total.toFixed(1)}</span>
+                      <div className="w-6 md:w-8 rounded-t" style={{height:(m.total/100*90)+'px',background:`hsl(${260-i*20},70%,${50+i*4}%)`,minHeight:2}}/>
+                      <img loading="lazy" src={favicon(m.ur)} className="w-4 h-4 md:w-5 md:h-5 rounded mt-1 bg-white/10" alt="" onError={e=>e.target.style.display='none'}/>
+                    </div>
                   ))}
                 </div>
               </div>
