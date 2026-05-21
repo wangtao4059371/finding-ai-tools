@@ -141,7 +141,7 @@ export default function Tools({ tools }) {
               {/* Real Radar: Claude vs Gemini */}
               <div className="flex-1 bg-white/5 backdrop-blur rounded-xl p-4 border border-white/10">
                 <div className="text-xs text-indigo-300 font-semibold mb-2 text-center">
-                  📡 {locale==='zh'?'Claude vs Gemini 雷达对比':'Claude vs Gemini Radar'}
+                  {locale==='zh'?'📡 Claude vs Gemini 雷达对比':'📡 Claude vs Gemini Radar'}
                 </div>
                 <div className="flex justify-center">
                   <svg width="140" height="140" viewBox="0 0 200 200">
@@ -169,7 +169,7 @@ export default function Tools({ tools }) {
                   {MODEL_DATA.slice(0,9).map((m,i)=>(
                     <div key={i} className="flex flex-col items-center justify-end h-full">
                       <span className="text-[8px] text-indigo-200/70 mb-0.5">{m.total.toFixed(1)}</span>
-                      <div className="w-6 md:w-8 rounded-t" style={{height:(m.total/100*90)+'px',background:`hsl(${260-i*20},70%,${50+i*4}%)`,minHeight:2}}/>
+                      <div className="w-8 md:w-10 rounded-t" style={{height:(m.total/100*90)+'px',background:`hsl(${260-i*20},70%,${50+i*4}%)`,minHeight:2}}/>
                       <img loading="lazy" src={favicon(m.ur)} className="w-4 h-4 md:w-5 md:h-5 rounded mt-1 bg-white/10" alt="" onError={e=>e.target.style.display='none'}/>
                     </div>
                   ))}

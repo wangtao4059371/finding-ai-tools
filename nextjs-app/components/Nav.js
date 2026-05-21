@@ -33,16 +33,6 @@ export default function Nav() {
           </Link>
           <nav className="flex gap-1">
               <Link
-                href="/ratings"
-                className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
-                  router.pathname === '/ratings'
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                {locale === 'zh' ? 'AI评分' : 'AI Ratings'}
-              </Link>
-              <Link
                 href="/"
                 className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
                   router.pathname === '/' || router.pathname.startsWith('/tool/')
@@ -50,7 +40,17 @@ export default function Nav() {
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                {locale === 'zh' ? 'AI工具' : 'AI Tools'}
+                {locale === 'zh' ? '热门AI工具与项目' : 'Hot AI Tools'}
+              </Link>
+              <Link
+                href="/ratings"
+                className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
+                  router.pathname === '/ratings'
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                {locale === 'zh' ? '热门AI评测排名' : 'AI Rankings'}
               </Link>
           </nav>
         </div>

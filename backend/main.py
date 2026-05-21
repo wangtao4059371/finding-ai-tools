@@ -1,6 +1,7 @@
 import sqlite3
 import re
 import os
+from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -144,9 +145,10 @@ def add_tool(tool: ToolSchema):
             return {"status": "skipped", "message": f"产品 [{tool.name}] 已经存在数据库中，直接跳过。"}
         
         slug = make_slug(tool.name)
+        now = datetime.now().isoformat()
         cursor.execute(
-            "INSERT INTO tools (name, logo, url, type, tag, base_model, framework, pricing, description, slug, stars) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (tool.name, tool.logo, tool.url, tool.type, tool.tag, tool.base_model, tool.framework, tool.pricing, tool.description, slug, tool.stars)
+            "INSERT INTO tools (name, logo, url, type, tag, base_model, framework, pricing, description, slug, stars, content_updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (tool.name, tool.logo, tool.url, tool.type, tool.tag, tool.base_model, tool.framework, tool.pricing, tool.description, slug, tool.stars, now)
         )
         conn.commit()
         return {"status": "success", "message": f"产品 [{tool.name}] 录入成功！"}
