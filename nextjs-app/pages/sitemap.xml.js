@@ -15,6 +15,7 @@ function generateSiteMap(tools) {
   <url><loc>${baseUrl}/contact</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
   <url><loc>${baseUrl}/privacy-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>${baseUrl}/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>${baseUrl}/ratings</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   ${tools.filter(t => t.slug).map(tool => `
   <url>
     <loc>${baseUrl}/tool/${tool.slug}</loc>
