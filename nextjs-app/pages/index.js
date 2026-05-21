@@ -117,8 +117,8 @@ export default function Home() {
             {compareIdx>=0&&<span className="text-xs text-indigo-600 cursor-pointer" onClick={()=>setCompareIdx(-1)}>VS {MODELS[compareIdx].nm} ✕</span>}
           </div>
           <div className="flex flex-col xl:flex-row gap-5 items-start">
-            <div className="w-full xl:w-[280px] flex-shrink-0 bg-gray-50 dark:bg-gray-750 rounded-xl border overflow-hidden max-h-[400px] xl:max-h-[600px] overflow-y-auto">
-              <div className="px-4 py-3 text-sm font-bold text-gray-400 uppercase border-b sticky top-0 bg-gray-50 dark:bg-gray-750">{t('模型')} ({MODELS.length})</div>
+            <div className="w-full xl:w-[280px] flex-shrink-0 bg-gray-50 dark:bg-gray-700 rounded-xl border overflow-hidden max-h-[400px] xl:max-h-[600px] overflow-y-auto">
+              <div className="px-4 py-3 text-sm font-bold text-gray-400 uppercase border-b sticky top-0 bg-gray-50 dark:bg-gray-700">{t('模型')} ({MODELS.length})</div>
               {MODELS.map((mod,i)=>(<div key={i} onClick={()=>{setMainIdx(i);setCompareIdx(-1)}} className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 transition-colors ${i===mainIdx?'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 font-bold':'hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
                 <L mod={mod}/><span className="truncate flex-1">{mod.nm}</span><span className="text-xs px-2 py-0.5 rounded-full bg-white dark:bg-gray-700 text-gray-500">{mod.total.toFixed(1)}</span>
               </div>))}
@@ -129,7 +129,7 @@ export default function Home() {
               <div className="flex flex-wrap gap-1.5 mt-4 justify-center">{tags.map((t,i)=><span key={i} className={`px-2.5 py-1 rounded-full text-xs font-semibold ${t.cls}`}>{t.icon} {dimT(DIMS[i])} {t.v}</span>)}</div>
             </div>
             <div className="w-full xl:w-[320px] flex-shrink-0">
-              <div className="bg-gray-50 dark:bg-gray-750 rounded-xl border p-6">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl border p-6">
                 {isCmp?(
                   <div>
                     <div className="font-bold text-lg text-indigo-600 mb-3">{t('对比详情')}</div>
