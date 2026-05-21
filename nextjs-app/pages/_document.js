@@ -9,9 +9,9 @@ export default function Document() {
         <meta name="theme-color" content="#4F46E5" />
 
         {/* Primary Meta */}
-        <meta name="title" content="Finding AI Tools - Best AI Agents & Tools Directory" />
-        <meta name="description" content="Discover the best AI tools, agents, and foundation models. ChatGPT, Claude, Gemini, Midjourney, Stable Diffusion - all in one place. Find the perfect AI tool for your needs." />
-        <meta name="keywords" content="AI tools, AI agents, ChatGPT, Gemini, Claude, Midjourney, AI directory, AI navigation, AI models, free AI tools, AI writing, AI image generation, AI video, deepseek, qianwen" />
+        <meta name="title" content="Finding AI Tools - Best AI Tools Directory & Model Rankings 2026" />
+        <meta name="description" content="Discover 250+ best AI tools, agents, and models. Compare 24 LLMs with SuperCLUE benchmark. ChatGPT, DeepSeek, Claude, Gemini, Midjourney, Stable Diffusion, Suno. Free & paid AI tools directory." />
+        <meta name="keywords" content="AI tools, AI agents, best AI tools 2026, AI tools directory, AI model comparison, SuperCLUE ranking, ChatGPT alternatives, free AI tools, AI writing tools, AI image generator, AI video creation, AI coding assistant, open source AI, LLM benchmark, AI agent framework, DeepSeek, Claude, Gemini, Midjourney, Stable Diffusion, Suno, AI music, AI learning" />
         <meta name="author" content="Finding AI Tools" />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
@@ -19,14 +19,14 @@ export default function Document() {
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://findingaitools.com" />
-        <meta property="og:title" content="Finding AI Tools - Best AI Agents & Tools Directory" />
-        <meta property="og:description" content="Discover the best AI tools, agents, and foundation models. Find the perfect AI tool for your needs." />
+        <meta property="og:title" content="Finding AI Tools - Best AI Tools Directory & LLM Rankings" />
+        <meta property="og:description" content="Explore 250+ best AI tools, agents, models. AI writing, image, video, coding, music tools. Compare 24 LLMs via SuperCLUE rankings." />
         <meta property="og:site_name" content="Finding AI Tools" />
         <meta property="og:locale" content="en_US" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Finding AI Tools - Best AI Agents & Tools Directory" />
+        <meta name="twitter:title" content="Finding AI Tools - Best AI Tools Directory & LLM Rankings" />
         <meta name="twitter:description" content="Discover the best AI tools, agents, and foundation models." />
 
         {/* Favicon */}

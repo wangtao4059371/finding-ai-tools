@@ -114,8 +114,8 @@ export default function Tools({ tools }) {
   return (
     <>
       <Head>
-        <title>Finding AI Tools - Best AI Agents & Tools Directory</title>
-        <meta name="description" content="Discover the best AI tools, agents, and foundation models. ChatGPT, Claude, Gemini, Midjourney - all in one place." />
+        <title>Finding AI Tools - 250+ Best AI Tools Directory & Model Rankings</title>
+        <meta name="description" content="Explore 250+ best AI tools, open source projects, agents & models. ChatGPT, DeepSeek, Claude, Gemini, Midjourney. AI writing, image generation, coding, video, music tools directory. Free & paid AI tools list." />
       </Head>
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">

@@ -16,7 +16,7 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>Finding AI Tools - Best AI Agents & Tools Directory</title>
+        <title>Finding AI Tools - Best AI Tools Directory & LLM Rankings</title>
       </Head>
       <Component {...pageProps} />
     </>

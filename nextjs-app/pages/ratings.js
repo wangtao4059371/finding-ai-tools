@@ -96,7 +96,7 @@ export default function Home() {
   const dimT=(d)=>(locale==='zh'?d.l:d.le);
 
   return(<>
-    <Head><title>AI 智能指数 SuperCLUE 2026 - Finding AI Tools</title><meta name="description" content="SuperCLUE中文大模型评测基准。24款模型6维度评测排名。"/></Head>
+    <Head><title>AI Model Rankings 2026 - SuperCLUE LLM Benchmark Comparison</title><meta name="description" content="Compare 24 AI LLM models with 6-dimension SuperCLUE benchmark. GPT-5.4, Claude Opus 4.6, DeepSeek V4 Pro, Gemini 3.1 Pro rankings. Math, coding, agent, science scores. Find the best AI model 2026." /></Head>
     <Nav/>
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-[1600px] mx-auto px-3 md:px-6 py-4 md:py-6">
