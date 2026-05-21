@@ -7,17 +7,19 @@ client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.dee
 H = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
 
 MODELS = [
-    ("Claude Opus 4.6","Anthropic","https://claude.ai"),
-    ("Gemini 3.1 Pro","Google DeepMind","https://deepmind.google/gemini"),
-    ("GPT-5.4","OpenAI","https://openai.com"),
-    ("Doubao Seed 2.0 Pro","字节跳动","https://www.volcengine.com"),
-    ("DeepSeek V4 Pro","深度求索","https://www.deepseek.com"),
-    ("Gemini 3 Flash","Google","https://deepmind.google/gemini"),
-    ("DeepSeek V4 Flash","深度求索","https://www.deepseek.com"),
-    ("Grok 4.20","xAI","https://x.ai"),
-    ("Kimi K2.5","月之暗面","https://kimi.moonshot.cn"),
-    ("Qwen 3.5 Think","阿里通义","https://tongyi.aliyun.com"),
-    ("GLM-5","智谱AI","https://www.zhipuai.cn"),
+    ("DeepSeek V3.2","深度求索","https://www.deepseek.com"),
+    ("MiMo V2 Pro","小米集团","https://www.mi.com"),
+    ("Tencent HY 2.0","腾讯","https://cloud.tencent.com"),
+    ("Qwen 3.5 122B","阿里通义","https://tongyi.aliyun.com"),
+    ("LongCat Flash","美团","https://www.meituan.com"),
+    ("GPT-OSS 120B","OpenAI","https://github.com/openai"),
+    ("Step 3.5 Flash","阶跃星辰","https://www.stepfun.com"),
+    ("MiniMax M2.5","稀宇科技","https://www.minimax.io"),
+    ("MiniMax M2.7","稀宇科技","https://www.minimax.io"),
+    ("Spark X2","科大讯飞","https://xinghuo.xfyun.cn"),
+    ("MiMo V2 Flash","小米集团","https://www.mi.com"),
+    ("Mistral Large 3","Mistral AI","https://mistral.ai"),
+    ("Llama 4 Maverick","Meta","https://llama.meta.com"),
 ]
 
 results = {}
