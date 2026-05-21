@@ -96,9 +96,9 @@ export default function Tools({ tools }) {
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 dark:from-indigo-900 dark:via-purple-900 dark:to-pink-900 py-16">
           <div className="max-w-7xl mx-auto px-4 text-center text-white">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
               {locale === 'zh' ? '发现最佳 AI 工具' : 'Discover the Best AI Tools'}
-            </h2>
+            </h1>
             <p className="text-lg sm:text-xl text-indigo-100 max-w-2xl mx-auto mb-8">
               {locale === 'zh' 
                 ? '一站式导航平台，收录全球 AI 模型、智能体、创作工具，帮你快速找到需要的 AI 解决方案。'

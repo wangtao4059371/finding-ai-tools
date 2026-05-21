@@ -103,7 +103,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-[1600px] mx-auto px-6 py-6">
         <div className="text-center mb-5">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('AI智能指数')}</h2>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('AI智能指数')}</h1>
           <p className="text-gray-500 text-sm mt-1">{locale==='zh'?`SuperCLUE 2026 · ${MODELS.length} 模型 · 6 维度`:`SuperCLUE 2026 · ${MODELS.length} models · 6 dims`}</p>
         </div>
 
