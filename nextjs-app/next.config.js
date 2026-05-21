@@ -2,11 +2,14 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
+      { protocol: 'https', hostname: '**' },
     ],
+  },
+  async redirects() {
+    return [
+      { source: '/tools', destination: '/', permanent: true },
+      { source: '/tools/:path*', destination: '/:path*', permanent: true },
+    ];
   },
   async headers() {
     return [
