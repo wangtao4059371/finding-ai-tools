@@ -51,9 +51,10 @@ export default function ToolCard({ tool }) {
             {tool.stars > 0 && (
               <span className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">⭐ {tool.stars.toLocaleString()}</span>
             )}
-            <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-800 dark:group-hover:text-indigo-300 transition-colors">
-              {locale === 'zh' ? '访问项目' : 'Visit'} →
-            </span>
+          <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-800 dark:group-hover:text-indigo-300 transition-colors"
+            onClick={(e) => { e.preventDefault(); if(typeof gtag!=='undefined')gtag('event','visit_project',{tool_name:tool.name}); window.open(tool.url,'_blank'); }}>
+            {locale === 'zh' ? '访问项目' : 'Visit'} →
+          </span>
           </div>
         </div>
       </div>

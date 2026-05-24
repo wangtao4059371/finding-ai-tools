@@ -115,6 +115,7 @@ export default function ToolDetail({ tool, relatedTools }) {
                 href={tool.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => { if (typeof gtag !== 'undefined') gtag('event', 'visit_project', { tool_name: tool.name }); }}
                 className="w-full sm:w-auto text-center bg-indigo-600 dark:bg-indigo-500 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all font-semibold"
               >
                 {t('visitProject')} →

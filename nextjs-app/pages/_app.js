@@ -11,6 +11,14 @@ export default function MyApp({ Component, pageProps }) {
         document.documentElement.classList.remove('dark');
       }
     }
+
+    const timer = setTimeout(() => {
+      if (typeof window !== 'undefined' && typeof gtag !== 'undefined') {
+        gtag('event', 'user_engaged_2min', { page: window.location.pathname });
+      }
+    }, 120000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
