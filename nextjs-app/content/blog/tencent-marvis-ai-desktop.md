@@ -76,19 +76,28 @@ Marvis 集合多种本地模型来理解文件内容：
 
 ## 硬件要求
 
-| 平台 | 最低配置 |
-|------|----------|
-| Windows | 6核 CPU, 16GB 内存, SSD, Win10+ x64 |
-| macOS | Apple Silicon (M1+), macOS 13+ |
-| Android | 标准安装 |
+| 平台 | CPU | 内存 | 硬盘 | 系统 |
+|------|-----|------|------|------|
+| Windows | ≥ 6核 | ≥ 16GB | SSD | Win10+ x64 |
+| macOS | Apple Silicon M1+ | 标准 | 标准 | macOS 13+ |
+| Android | 标准 | 标准 | 标准 | — |
 
-macOS 版目前仅支持 arm64 架构（M1/M2/M3/M4），Intel Mac 暂不支持。
+> macOS 仅支持 arm64（M1/M2/M3/M4），Intel Mac 暂不兼容。
 
-## 下载
+## 版本与下载
 
-- Windows: [v1.0.0.36 下载](https://down.marvis.qq.com/marvis_install/channelsup/marvis_4100100002_1.0.0.36_x64_6347.exe)
-- macOS: [v1.0.10036 下载](https://down.marvis.qq.com/marvis/pipeline/installer_test/128/marvis_1.0.10036_arm64_4000000002.dmg)
-- Android: [v1.0.5 下载](https://imtt2.dd.qq.com/sjy.00007/sjy.00004/16891/apk/12725B9A5308F6033C4D6E2D30DB5D69.apk?fsname=com.tencent.android.marvis_1.0.5.apk)
+| 平台 | 版本 | 大小 | 下载 |
+|------|------|------|------|
+| Windows | v1.0.0.36 (x64) | ~8.3 MB | [下载](https://down.marvis.qq.com/marvis_install/channelsup/marvis_4100100002_1.0.0.36_x64_6347.exe) |
+| macOS | v1.0.10036 (arm64) | ~1.2 GB | [下载](https://down.marvis.qq.com/marvis/pipeline/installer_test/128/marvis_1.0.10036_arm64_4000000002.dmg) |
+| Android | v1.0.5 | — | [下载](https://imtt2.dd.qq.com/sjy.00007/sjy.00004/16891/apk/12725B9A5308F6033C4D6E2D30DB5D69.apk?fsname=com.tencent.android.marvis_1.0.5.apk) |
+| iOS | 暂未开放 | — | 预计 6 月中旬上线 |
+
+## 相关链接
+
+- 官网：[marvis.qq.com](https://marvis.qq.com/)
+- 使用协议：[查看](https://rule.tencent.com/rule/202604280002)
+- 隐私条款：[查看](https://privacy.qq.com/document/preview/6c3760b1810e436ca8bd122984cd5183)
 
 ---
 
