@@ -87,9 +87,12 @@ export default function Tools({ tools }) {
   let filteredTools = activeTag === '全部' ? tools : tools.filter(t => t.tag === activeTag);
   
   if (searchQuery.trim()) {
+    const q = searchQuery.trim();
     filteredTools = filteredTools.filter(tool => 
-      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+      tool.name.toLowerCase().includes(q.toLowerCase()) ||
+      tool.description.toLowerCase().includes(q.toLowerCase()) ||
+      tool.pricing.toLowerCase().includes(q.toLowerCase()) ||
+      tool.type.toLowerCase() === q.toLowerCase()
     );
   }
 
