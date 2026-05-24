@@ -50,6 +50,7 @@
 .prose table { border-collapse: collapse; width: 100%; }
 .prose table th,
 .prose table td { border: 1px solid #d1d5db; padding: 8px 12px; text-align: left; }
+.prose table td a { color: #4f46e5; text-decoration: underline; font-weight: 500; }
 .prose table th { background: #f9fafb; font-weight: 600; }
 .dark .prose table th,
 .dark .prose table td { border-color: #4b5563; }
