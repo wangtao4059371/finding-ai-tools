@@ -19,6 +19,12 @@ export default function BlogPost({ post }) {
     );
   }
 
+  // Split content by language
+  const parts = post.content.split('---\n\n## English Version');
+  const zhContent = parts[0] || post.content;
+  const enContent = parts.length > 1 ? '## English Version' + parts[1] : '';
+  const displayContent = locale === 'zh' ? zhContent : (enContent || zhContent);
+
   return (
     <>
       <Head>
@@ -45,8 +51,13 @@ export default function BlogPost({ post }) {
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">{post.title}</h1>
             <div className="prose dark:prose-invert prose-indigo max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-code:bg-gray-100 dark:prose-code:bg-gray-700 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
             </div>
+            {post.source && (
+              <p className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400">
+                {t('原文出处', 'Source')}: <a href={post.source} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{post.source}</a>
+              </p>
+            )}
           </article>
         </main>
       </div>

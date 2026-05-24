@@ -30,7 +30,7 @@ export function getPostBySlug(slug) {
   if (!fs.existsSync(file)) return null;
   const raw = fs.readFileSync(file, 'utf-8');
   const { data, content } = matter(raw);
-  return { slug, title: data.title, date: data.date, excerpt: data.excerpt, category: data.category, cover: data.cover, content };
+  return { slug, title: data.title, date: data.date, excerpt: data.excerpt, category: data.category, cover: data.cover, source: data.source, content };
 }
 
 export function getCategories() {
