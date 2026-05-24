@@ -1,0 +1,69 @@
+import Head from 'next/head';
+import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import Nav from '../../components/Nav';
+import { getAllPosts, getPostBySlug } from '../../lib/blog';
+import { getLocale } from '../../lib/i18n';
+
+export default function BlogPost({ post }) {
+  const locale = getLocale();
+  const t = (zh, en) => locale === 'zh' ? zh : en;
+
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Nav />
+        <div className="max-w-3xl mx-auto px-4 py-20 text-center text-gray-400">{t('文章不存在', 'Post not found')}</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Head>
+        <title>{post.title} - Finding AI Tools</title>
+        <meta name="description" content={post.excerpt} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta property="article:published_time" content={post.date} />
+        <link rel="canonical" href={`https://findingaitools.com/blog/${post.slug}`} />
+      </Head>
+      <Nav />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <header className="bg-white dark:bg-gray-800 shadow-sm border-b">
+          <div className="max-w-3xl mx-auto px-4 py-4">
+            <Link href="/blog" className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">← {t('返回博客', 'Back to Blog')}</Link>
+          </div>
+        </header>
+        <main className="max-w-3xl mx-auto px-4 py-8">
+          <article className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-10">
+            <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
+              <span className="bg-indigo-50 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded">{post.category}</span>
+              <span>{post.date}</span>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">{post.title}</h1>
+            <div className="prose dark:prose-invert prose-indigo max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-code:bg-gray-100 dark:prose-code:bg-gray-700 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+            </div>
+          </article>
+        </main>
+      </div>
+    </>
+  );
+}
+
+export async function getStaticPaths() {
+  const posts = getAllPosts();
+  return {
+    paths: posts.map(p => ({ params: { slug: p.slug } })),
+    fallback: 'blocking',
+  };
+}
+
+export async function getStaticProps({ params }) {
+  const post = getPostBySlug(params.slug);
+  if (!post) return { notFound: true };
+  return { props: { post }, revalidate: 60 };
+}
