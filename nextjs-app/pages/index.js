@@ -239,7 +239,7 @@ export default function Tools({ tools }) {
         {/* Ad Banner */}
         <div className="max-w-7xl mx-auto px-4 py-4">
           <ins className="adsbygoogle block mx-auto" style={{display:'block',maxWidth:728,height:90}}
-            data-ad-client="ca-pub-XXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"/>
+            data-ad-client="ca-pub-7649278856996509" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"/>
         </div>
 
         {/* Search + Sort + Filter */}

@@ -15,6 +15,7 @@ export default function Document() {
         <meta name="author" content="Finding AI Tools" />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
+        <meta name="google-adsense-account" content="ca-pub-7649278856996509" />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />

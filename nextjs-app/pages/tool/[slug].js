@@ -57,7 +57,7 @@ export default function ToolDetail({ tool, relatedTools }) {
 
         <main className="max-w-3xl mx-auto px-4 py-8">
           <ins className="adsbygoogle block mx-auto mb-6" style={{display:'block',maxWidth:728,height:90}}
-            data-ad-client="ca-pub-XXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"/>
+            data-ad-client="ca-pub-7649278856996509" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"/>
           
           <article className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 transition-all animate-fade-in">
             <div className="flex items-center gap-4 mb-6">

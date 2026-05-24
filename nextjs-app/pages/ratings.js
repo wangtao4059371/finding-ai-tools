@@ -102,7 +102,7 @@ export default function Home() {
         <div className="max-w-[1600px] mx-auto px-3 md:px-6 py-4 md:py-6">
           {/* Ad Banner */}
           <ins className="adsbygoogle block mx-auto mb-6" style={{display:'block',maxWidth:728,height:90}}
-            data-ad-client="ca-pub-XXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"/>
+            data-ad-client="ca-pub-7649278856996509" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"/>
           
           <div className="text-center mb-5">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('AI智能指数')}</h1>
