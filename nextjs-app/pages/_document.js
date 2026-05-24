@@ -15,20 +15,14 @@ export default function Document() {
         <meta name="author" content="Finding AI Tools" />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
-        <meta name="google-adsense-account" content="ca-pub-7649278856996509" />
+<meta name="google-adsense-account" content="ca-pub-7649278856996509" />
 
-        {/* Open Graph */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://findingaitools.com" />
-        <meta property="og:title" content="Finding AI Tools - Best AI Tools Directory & LLM Rankings" />
-        <meta property="og:description" content="Explore 250+ best AI tools, agents, models. AI writing, image, video, coding, music tools. Compare 24 LLMs via SuperCLUE rankings." />
-        <meta property="og:site_name" content="Finding AI Tools" />
-        <meta property="og:locale" content="en_US" />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Finding AI Tools - Best AI Tools Directory & LLM Rankings" />
-        <meta name="twitter:description" content="Discover the best AI tools, agents, and foundation models." />
+        {/* Preconnect to external domains for speed */}
+        <link rel="preconnect" href="https://www.google.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.google.com" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
 
         {/* Favicon */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
