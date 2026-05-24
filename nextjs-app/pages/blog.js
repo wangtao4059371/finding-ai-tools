@@ -50,5 +50,5 @@ export default function Blog({ posts, categories }) {
 export async function getStaticProps() {
   const posts = getAllPosts();
   const categories = getCategories();
-  return { props: { posts, categories }, revalidate: 60 };
+  return { props: { posts, categories }, revalidate: 3600 };
 }

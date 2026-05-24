@@ -12,7 +12,7 @@ source: "https://zhuanlan.zhihu.com/p/2015111659312662474"
 
 Codex 和 Claude Code 的核心差异在于**任务完成时间跨度**——模型能以一定可靠性完成多长的任务（按人类专家时间衡量）。Opus 4.6 在 50% 成功率下能处理 12 小时的任务，而 GPT-5.3-Codex 仅 5 小时 50 分钟。80% 成功率时差距缩小，但模型能力差距确实存在，并直接映射到两个 agent 处理困难任务的能力上。
 
-![任务完成时间跨度对比](/blog/img_01.jpg)
+![任务完成时间跨度对比](/blog/img_01.webp)
 
 ## 速度 vs 可靠性
 
@@ -34,7 +34,7 @@ Claude Code 用 TypeScript + React + Ink，打包为 Bun 可执行文件（Anthr
 
 Morphism 评测显示：**相同任务 Claude Code 比 Codex 多消耗 3.2–4.2 倍 Token**。做 Figma 插件，Codex 用 150 万 Token，Claude 用 620 万。这意味着 Claude 订阅更容易撞 Token 上限。
 
-![Token 效率对比](/blog/img_02.jpg)
+![Token 效率对比](/blog/img_02.webp)
 
 ## 使用体验
 
@@ -44,7 +44,7 @@ Morphism 评测显示：**相同任务 Claude Code 比 Codex 多消耗 3.2–4.2
 
 VS Code Marketplace：Claude Code 610 万安装量，4/5 分；Codex 540 万，3.5/5 分。GitHub 星数：Claude Code 约 65-72K，Codex 约 64K。
 
-![GitHub Stars 对比](/blog/img_03.jpg)
+![GitHub Stars 对比](/blog/img_03.webp)
 
 ## 为什么我换回 Claude Code
 
@@ -52,7 +52,7 @@ VS Code Marketplace：Claude Code 610 万安装量，4/5 分；Codex 540 万，3
 
 选哪个不只是编程问题，等于订阅整个生态。Claude 正变成像 Apple 一样火热的生态——Claude Cowork、Chat、Code 三件套。OpenAI 这边除了 Codex 都挺无聊。我已用 Claude Chat 替代 ChatGPT，没动力迁移。
 
-![生态对比](/blog/img_04.jpg)
+![生态对比](/blog/img_04.webp)
 
 ### 价格
 
@@ -77,7 +77,7 @@ VS Code Marketplace：Claude Code 610 万安装量，4/5 分；Codex 540 万，3
 
 100 道题中，Claude Code 赢 42 道，Codex 赢 33 道，25 道平手。Claude 赢主要因为置信度阈值更松、生成温度稍高（0.2 vs 0.1）。
 
-![对比结果](/blog/img_05.jpg)
+![对比结果](/blog/img_05.webp)
 
 ## 选一个吧
 
