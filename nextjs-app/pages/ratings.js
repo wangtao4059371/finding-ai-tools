@@ -98,9 +98,13 @@ export default function Home() {
   return(<>
     <Head><title>AI Model Rankings 2026 - SuperCLUE LLM Benchmark Comparison</title><meta name="description" content="Compare 24 AI LLM models with 6-dimension SuperCLUE benchmark. GPT-5.4, Claude Opus 4.6, DeepSeek V4 Pro, Gemini 3.1 Pro rankings. Math, coding, agent, science scores. Find the best AI model 2026." /></Head>
     <Nav/>
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-[1600px] mx-auto px-3 md:px-6 py-4 md:py-6">
-        <div className="text-center mb-5">
+<div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-[1600px] mx-auto px-3 md:px-6 py-4 md:py-6">
+          {/* Ad Banner */}
+          <ins className="adsbygoogle block mx-auto mb-6" style={{display:'block',maxWidth:728,height:90}}
+            data-ad-client="ca-pub-XXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"/>
+          
+          <div className="text-center mb-5">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('AI智能指数')}</h1>
           <p className="text-gray-500 text-sm mt-1">{locale==='zh'?`SuperCLUE 2026 · ${MODELS.length} 模型 · 6 维度`:`SuperCLUE 2026 · ${MODELS.length} models · 6 dims`}</p>
         </div>
