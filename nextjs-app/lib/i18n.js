@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 const translations = {
   zh: {
     title: '🤖 AI 智能体与工具导航',
@@ -47,9 +49,22 @@ export function getLocale() {
   return 'en';
 }
 
-export function t(key) {
-  const locale = getLocale();
+export function useLocale() {
+  const [locale, setLocale] = useState('en');
+
+  useEffect(() => {
+    setLocale(getLocale());
+  }, []);
+
+  return locale;
+}
+
+export function translate(key, locale = 'en') {
   return translations[locale]?.[key] || translations.en[key] || key;
+}
+
+export function t(key) {
+  return translate(key, getLocale());
 }
 
 export default translations;

@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import Nav from '../components/Nav';
-import { getLocale } from '../lib/i18n';
+import { useLocale } from '../lib/i18n';
 
 export default function Contact() {
-  const locale = getLocale();
+  const locale = useLocale();
   const t = (zh, en) => locale === 'zh' ? zh : en;
 
   return (
@@ -11,6 +11,7 @@ export default function Contact() {
       <Head>
         <title>{t('联系我们 - AI 智能指数', 'Contact - Finding AI Tools')}</title>
         <meta name="robots" content="index,follow" />
+        <link rel="canonical" href="https://findingaitools.com/contact" />
       </Head>
       <Nav />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

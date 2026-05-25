@@ -83,7 +83,10 @@ export default function Home() {
   const [locale, setLocale] = useState('en');
   const [mounted, setMounted] = useState(false);
   useEffect(()=>{setMounted(true);setLocale(getLocale())},[]);
-  if(!mounted)return<div className="min-h-screen bg-gray-50 dark:bg-gray-900"/>;
+  const pageHead = (
+    <Head><title>AI Model Rankings 2026 - SuperCLUE LLM Benchmark Comparison</title><meta name="description" content="Compare 24 AI LLM models with 6-dimension SuperCLUE benchmark. GPT-5.4, Claude Opus 4.6, DeepSeek V4 Pro, Gemini 3.1 Pro rankings. Math, coding, agent, science scores. Find the best AI model 2026." /><link rel="canonical" href="https://findingaitools.com/ratings" /></Head>
+  );
+  if(!mounted)return<>{pageHead}<div className="min-h-screen bg-gray-50 dark:bg-gray-900"/></>;
 
   const m = MODELS[mainIdx];
   const models = [m];
@@ -96,7 +99,7 @@ export default function Home() {
   const dimT=(d)=>(locale==='zh'?d.l:d.le);
 
   return(<>
-    <Head><title>AI Model Rankings 2026 - SuperCLUE LLM Benchmark Comparison</title><meta name="description" content="Compare 24 AI LLM models with 6-dimension SuperCLUE benchmark. GPT-5.4, Claude Opus 4.6, DeepSeek V4 Pro, Gemini 3.1 Pro rankings. Math, coding, agent, science scores. Find the best AI model 2026." /></Head>
+    {pageHead}
     <Nav/>
 <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-[1600px] mx-auto px-3 md:px-6 py-4 md:py-6">

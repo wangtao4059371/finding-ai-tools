@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { getLocale } from '../lib/i18n';
+import { useLocale } from '../lib/i18n';
 
 export default function Nav() {
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
-  const locale = getLocale();
+  const locale = useLocale();
 
   useEffect(() => {
     setDarkMode(document.documentElement.classList.contains('dark'));
@@ -26,47 +26,45 @@ export default function Nav() {
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-            Finding AI Tools
+      <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3 md:flex-nowrap md:justify-between">
+        <Link href="/" className="mr-auto text-xl font-bold leading-tight text-indigo-600 dark:text-indigo-400 md:mr-0">
+          Finding AI Tools
+        </Link>
+        <nav className="order-last flex w-full gap-1 overflow-x-auto whitespace-nowrap pb-1 md:order-none md:w-auto md:overflow-visible md:pb-0">
+          <Link
+            href="/"
+            className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors md:px-4 md:text-base ${
+              router.pathname === '/' || router.pathname.startsWith('/tool/')
+                ? 'bg-indigo-600 text-white'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            {locale === 'zh' ? '热门AI工具与项目' : 'Hot AI Tools'}
           </Link>
-          <nav className="flex gap-1">
-              <Link
-                href="/"
-                className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
-                  router.pathname === '/' || router.pathname.startsWith('/tool/')
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                {locale === 'zh' ? '热门AI工具与项目' : 'Hot AI Tools'}
-              </Link>
-              <Link
-                href="/ratings"
-                className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
-                  router.pathname === '/ratings'
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                {locale === 'zh' ? '热门AI评测排名' : 'AI Rankings'}
-              </Link>
-              <Link
-                href="/blog"
-                className={`px-4 py-2 rounded-lg text-base font-semibold transition-colors ${
-                  router.pathname.startsWith('/blog')
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                📝 {locale === 'zh' ? '博客' : 'Blog'}
-              </Link>
-          </nav>
-        </div>
+          <Link
+            href="/ratings"
+            className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors md:px-4 md:text-base ${
+              router.pathname === '/ratings'
+                ? 'bg-indigo-600 text-white'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            {locale === 'zh' ? '热门AI评测排名' : 'AI Rankings'}
+          </Link>
+          <Link
+            href="/blog"
+            className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors md:px-4 md:text-base ${
+              router.pathname.startsWith('/blog')
+                ? 'bg-indigo-600 text-white'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            📝 {locale === 'zh' ? '博客' : 'Blog'}
+          </Link>
+        </nav>
         <button
           onClick={toggleDark}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           {darkMode ? (
             <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zm8.66-12.66a1 1 0 0 1 0 1.42l-.71.71a1 1 0 1 1-1.42-1.42l.71-.71a1 1 0 0 1 1.42 0zM5.64 16.34a1 1 0 0 1 0 1.42l-.71.71a1 1 0 1 1-1.42-1.42l.71-.71a1 1 0 0 1 1.42 0zM21 12a1 1 0 0 1-1 1h-1a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1zM5 12a1 1 0 0 1-1 1H3a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1zm15.66 4.34a1 1 0 0 1-1.42 0l-.71-.71a1 1 0 1 1 1.42-1.42l.71.71a1 1 0 0 1 0 1.42zM7.05 7.05a1 1 0 0 1-1.42 0l-.71-.71a1 1 0 0 1 1.42-1.42l.71.71a1 1 0 0 1 0 1.42zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>

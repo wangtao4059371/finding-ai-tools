@@ -2,11 +2,12 @@ import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
 import { getAllTools, getToolBySlug } from '../../lib/api';
-import { getLocale, t } from '../../lib/i18n';
+import { translate, useLocale } from '../../lib/i18n';
 import ToolCard from '../../components/ToolCard';
 
 export default function ToolDetail({ tool, relatedTools }) {
-  const locale = getLocale();
+  const locale = useLocale();
+  const t = key => translate(key, locale);
 
   if (!tool) {
     return (
@@ -23,12 +24,14 @@ export default function ToolDetail({ tool, relatedTools }) {
     description: tool.description,
     url: `https://findingaitools.com/tool/${tool.slug}`,
   };
+  const canonicalUrl = `https://findingaitools.com/tool/${tool.slug}`;
 
   return (
     <>
       <Head>
-        <title>{tool.name} - Finding AI Tools</title>
+        <title>{`${tool.name} - Finding AI Tools`}</title>
         <meta name="description" content={tool.description} />
+        <link rel="canonical" href={canonicalUrl} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </Head>
 

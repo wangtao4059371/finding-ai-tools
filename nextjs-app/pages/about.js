@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import Nav from '../components/Nav';
-import { getLocale } from '../lib/i18n';
+import { useLocale } from '../lib/i18n';
 
 export default function About() {
-  const locale = getLocale();
+  const locale = useLocale();
   const t = (zh, en) => locale === 'zh' ? zh : en;
 
   return (

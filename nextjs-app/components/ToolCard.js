@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getLocale } from '../lib/i18n';
+import { useLocale } from '../lib/i18n';
 
 export default function ToolCard({ tool }) {
-  const locale = getLocale();
+  const locale = useLocale();
   
   return (
     <Link href={`/tool/${tool.slug || tool.id}`}>

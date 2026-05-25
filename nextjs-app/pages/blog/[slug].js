@@ -3,62 +3,235 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Nav from '../../components/Nav';
-import { getAllPosts, getPostBySlug } from '../../lib/blog';
-import { getLocale } from '../../lib/i18n';
+import { getAdjacentPosts, getAllPosts, getPostBySlug, getRelatedPosts } from '../../lib/blog';
+import { useLocale } from '../../lib/i18n';
 
-export default function BlogPost({ post }) {
-  const locale = getLocale();
+function getHeadings(content) {
+  return content
+    .split('\n')
+    .map(line => {
+      const match = /^(#{2,3})\s+(.+)$/.exec(line.trim());
+      if (!match) return null;
+      const text = match[2].replace(/[#*_`[\]()]/g, '').trim();
+      if (!text || text.toLowerCase() === 'english version') return null;
+      return { level: match[1].length, text };
+    })
+    .filter(Boolean)
+    .map((heading, index) => ({ ...heading, id: `section-${index}` }));
+}
+
+function markdownText(children) {
+  return Array.isArray(children) ? children.join('') : String(children || '');
+}
+
+function Meta({ post, locale }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+      <span className="rounded-md bg-indigo-50 px-2 py-1 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+        {post.category}
+      </span>
+      <span>{post.date}</span>
+      <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+      <span>{locale === 'zh' ? `约 ${post.readingTime} 分钟` : `${post.readingTime} min read`}</span>
+    </div>
+  );
+}
+
+function Toc({ headings, title }) {
+  if (!headings.length) return null;
+  return (
+    <nav className="space-y-1 text-sm">
+      <p className="mb-3 font-semibold text-gray-900 dark:text-gray-100">{title}</p>
+      {headings.map(heading => (
+        <a
+          key={heading.id}
+          href={`#${heading.id}`}
+          className={`block rounded-md py-1.5 pr-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-indigo-400 ${heading.level === 3 ? 'pl-5' : 'pl-2 font-medium'}`}
+        >
+          {heading.text}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+function RelatedCard({ post, locale }) {
+  return (
+    <Link href={`/blog/${post.slug}`} className="group block">
+      <article className="min-w-0 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800">
+        <div className="aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-700">
+          <img src={post.cover} alt={post.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
+        </div>
+        <div className="p-4">
+          <Meta post={post} locale={locale} />
+          <h3 className="mt-3 line-clamp-2 break-all text-base font-bold leading-snug text-gray-900 group-hover:text-indigo-600 sm:break-words dark:text-gray-100 dark:group-hover:text-indigo-400" style={{ overflowWrap: 'anywhere' }}>
+            {post.title}
+          </h3>
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+function AdjacentLink({ post, label, align = 'left' }) {
+  if (!post) return <div />;
+  return (
+    <Link
+      href={`/blog/${post.slug}`}
+      className={`block rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800 ${align === 'right' ? 'text-right' : ''}`}
+    >
+      <span className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">{label}</span>
+      <p className="mt-2 line-clamp-2 break-all text-sm font-semibold text-gray-900 sm:break-words dark:text-gray-100" style={{ overflowWrap: 'anywhere' }}>{post.title}</p>
+    </Link>
+  );
+}
+
+export default function BlogPost({ post, relatedPosts, previousPost, nextPost }) {
+  const locale = useLocale();
   const t = (zh, en) => locale === 'zh' ? zh : en;
 
   if (!post) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Nav />
-        <div className="max-w-3xl mx-auto px-4 py-20 text-center text-gray-400">{t('文章不存在', 'Post not found')}</div>
+        <div className="mx-auto max-w-3xl px-4 py-20 text-center text-gray-400">{t('文章不存在', 'Post not found')}</div>
       </div>
     );
   }
 
-  // Split content by language
   const parts = post.content.split('---\n\n## English Version');
   const zhContent = parts[0] || post.content;
   const enContent = parts.length > 1 ? '## English Version' + parts[1] : '';
   const displayContent = locale === 'zh' ? zhContent : (enContent || zhContent);
+  const displayExcerpt = locale === 'zh' ? post.excerpt : (post.excerpt_en || post.excerpt);
+  const headings = getHeadings(displayContent);
+  let headingIndex = 0;
+  const canonicalUrl = `https://findingaitools.com/blog/${post.slug}`;
+  const imageUrl = post.cover.startsWith('http') ? post.cover : `https://findingaitools.com${post.cover}`;
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: displayExcerpt,
+    image: imageUrl,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { '@type': 'Organization', name: 'Finding AI Tools' },
+    publisher: { '@type': 'Organization', name: 'Finding AI Tools' },
+    mainEntityOfPage: canonicalUrl,
+  };
+
+  const markdownComponents = {
+    h2: ({ children }) => {
+      if (markdownText(children).trim().toLowerCase() === 'english version') {
+        return <h2>{children}</h2>;
+      }
+      const heading = headings[headingIndex++];
+      return <h2 id={heading?.id}>{children}</h2>;
+    },
+    h3: ({ children }) => {
+      const heading = headings[headingIndex++];
+      return <h3 id={heading?.id}>{children}</h3>;
+    },
+    img: ({ src, alt }) => (
+      <span className="my-8 block overflow-hidden rounded-lg border border-gray-100 bg-gray-100 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <img src={src} alt={alt || ''} className="w-full object-cover" loading="lazy" />
+      </span>
+    ),
+    table: ({ children }) => (
+      <div className="my-6 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+        <table>{children}</table>
+      </div>
+    ),
+    blockquote: ({ children }) => (
+      <blockquote className="rounded-lg border-l-4 border-indigo-500 bg-indigo-50 px-5 py-4 text-gray-700 dark:bg-indigo-950/40 dark:text-gray-300">
+        {children}
+      </blockquote>
+    ),
+  };
 
   return (
     <>
       <Head>
-        <title>{post.title} - Finding AI Tools</title>
-        <meta name="description" content={post.excerpt} />
+        <title>{`${post.title} - Finding AI Tools`}</title>
+        <meta name="description" content={displayExcerpt} />
         <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:description" content={displayExcerpt} />
         <meta property="og:type" content="article" />
+        <meta property="og:image" content={imageUrl} />
         <meta property="article:published_time" content={post.date} />
-        <link rel="canonical" href={`https://findingaitools.com/blog/${post.slug}`} />
+        <meta property="article:modified_time" content={post.date} />
+        <link rel="canonical" href={canonicalUrl} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       </Head>
       <Nav />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b">
-          <div className="max-w-3xl mx-auto px-4 py-4">
-            <Link href="/blog" className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">← {t('返回博客', 'Back to Blog')}</Link>
+        <header className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800">
+          <div className="mx-auto max-w-6xl px-4 py-4">
+            <Link href="/blog" className="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+              {t('返回博客', 'Back to Blog')}
+            </Link>
           </div>
         </header>
-        <main className="max-w-3xl mx-auto px-4 py-8">
-          <article className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-10">
-            <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
-              <span className="bg-indigo-50 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded">{post.category}</span>
-              <span>{post.date}</span>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">{post.title}</h1>
-            <div className="prose dark:prose-invert prose-indigo max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-code:bg-gray-100 dark:prose-code:bg-gray-700 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-table:border prose-table:border-gray-200 dark:prose-table:border-gray-600 prose-th:border prose-th:border-gray-200 dark:prose-th:border-gray-600 prose-th:bg-gray-50 dark:prose-th:bg-gray-700 prose-th:px-3 prose-th:py-2 prose-td:border prose-td:border-gray-200 dark:prose-td:border-gray-600 prose-td:px-3 prose-td:py-2">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
-            </div>
-            {post.source && (
-              <p className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400">
-                {t('原文出处', 'Source')}: <a href={post.source} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{post.source}</a>
-              </p>
-            )}
-          </article>
+
+        <main className="mx-auto max-w-6xl px-4 py-8">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_240px]">
+            <article className="min-w-0">
+              <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <div className="aspect-[16/9] bg-gray-100 dark:bg-gray-700">
+                  <img src={post.cover} alt={post.title} className="h-full w-full object-cover" loading="eager" />
+                </div>
+                <div className="p-6 md:p-10">
+                  <Meta post={post} locale={locale} />
+                  <h1 className="mt-4 break-all text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:break-words dark:text-gray-100 md:text-4xl" style={{ overflowWrap: 'anywhere' }}>
+                    {post.title}
+                  </h1>
+                  <p className="mt-4 break-all text-base leading-7 text-gray-600 sm:break-words dark:text-gray-400">{displayExcerpt}</p>
+
+                  {headings.length > 0 && (
+                    <details className="mt-6 rounded-lg border border-gray-100 bg-gray-50 p-4 lg:hidden dark:border-gray-700 dark:bg-gray-900">
+                      <summary className="cursor-pointer text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        {t('文章目录', 'Contents')}
+                      </summary>
+                      <div className="mt-4">
+                        <Toc headings={headings} title="" />
+                      </div>
+                    </details>
+                  )}
+
+                  <div className="prose prose-indigo mt-8 max-w-none prose-headings:scroll-mt-24 prose-headings:text-gray-900 prose-p:leading-7 prose-p:text-gray-700 prose-li:text-gray-700 prose-code:rounded prose-code:bg-gray-100 prose-code:px-1 prose-pre:bg-gray-900 prose-table:m-0 prose-table:w-full prose-th:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 dark:prose-invert dark:prose-headings:text-gray-100 dark:prose-p:text-gray-300 dark:prose-li:text-gray-300 dark:prose-code:bg-gray-700 dark:prose-pre:bg-gray-950 dark:prose-th:bg-gray-700">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{displayContent}</ReactMarkdown>
+                  </div>
+
+                  {post.source && (
+                    <p className="mt-6 border-t border-gray-100 pt-5 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                      {t('原文出处', 'Source')}: <a href={post.source} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline dark:text-indigo-400">{post.source}</a>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-8 grid gap-4 md:grid-cols-2">
+                <AdjacentLink post={previousPost} label={t('上一篇', 'Previous')} />
+                <AdjacentLink post={nextPost} label={t('下一篇', 'Next')} align="right" />
+              </div>
+
+              {relatedPosts.length > 0 && (
+                <section className="mt-10">
+                  <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100">{t('相关文章', 'Related Articles')}</h2>
+                  <div className="grid gap-5 md:grid-cols-3">
+                    {relatedPosts.map(related => <RelatedCard key={related.slug} post={related} locale={locale} />)}
+                  </div>
+                </section>
+              )}
+            </article>
+
+            <aside className="hidden lg:block">
+              <div className="sticky top-24 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <Toc headings={headings} title={t('文章目录', 'Contents')} />
+              </div>
+            </aside>
+          </div>
         </main>
       </div>
     </>
@@ -76,5 +249,7 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const post = getPostBySlug(params.slug);
   if (!post) return { notFound: true };
-  return { props: { post }, revalidate: 3600 };
+  const { previousPost, nextPost } = getAdjacentPosts(params.slug);
+  const relatedPosts = getRelatedPosts(params.slug, post.category);
+  return { props: { post, relatedPosts, previousPost, nextPost }, revalidate: 3600 };
 }
