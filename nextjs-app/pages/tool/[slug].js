@@ -154,9 +154,11 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   try {
     const tools = await getAllTools();
-    const tool = tools.find(t => t.slug === params.slug);
+    const summaryTool = tools.find(t => t.slug === params.slug);
     
-    if (!tool) return { notFound: true };
+    if (!summaryTool) return { notFound: true };
+
+    const tool = await getToolBySlug(params.slug);
     
     const relatedTools = tools
       .filter(t => t.tag === tool.tag && t.id !== tool.id)

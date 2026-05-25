@@ -1,7 +1,7 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:8001';
 
 export async function getAllTools() {
-  const res = await fetch(`${API_BASE}/api/tools`);
+  const res = await fetch(`${API_BASE}/api/tools/summary`);
   if (!res.ok) throw new Error('Failed to fetch tools');
   return res.json();
 }
