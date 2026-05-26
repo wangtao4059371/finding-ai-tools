@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Nav from '../components/Nav';
 import RadarChart from '../components/RadarChart';
 import { getLocale } from '../lib/i18n';
+import { trackEvent } from '../lib/analytics';
 
 const getDim = (m,k) => m[k] || 0;
 const COLORS = ['#6366f1','#ef4444','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#f97316','#84cc16','#14b8a6','#e11d48','#3b82f6','#a855f7','#eab308','#0ea5e9','#22c55e','#d946ef','#64748b','#f43f5e','#0d9488','#8b5cf6','#ea580c','#2563eb','#ca8a04'];
@@ -97,6 +98,37 @@ export default function Home() {
   const topDims=DIMS.filter(d=>getDim(m,d.k)>=80),lowDims=DIMS.filter(d=>getDim(m,d.k)<=30);
   const t=(k)=>({zh:{'AI智能指数':'AI 智能指数','当前':'当前','选择对比':'-- 选择对比 --','模型':'模型','对比详情':'对比详情','维度':'维度','总分':'总分','综合评分':'SuperCLUE总分','访问官网':'🌐 访问官网','总分排名':'📊 总分排名'}[k],en:{'AI智能指数':'AI Intelligence Index','当前':'Current','选择对比':'-- Select --','模型':'Models','对比详情':'Comparison','维度':'Dim','总分':'Total','综合评分':'SuperCLUE Score','访问官网':'🌐 Visit','总分排名':'📊 Total Score Ranking'}[k]}[locale]||k);
   const dimT=(d)=>(locale==='zh'?d.l:d.le);
+  const handleModelSelect = (idx, source = 'model_list') => {
+    if (idx < 0 || idx >= MODELS.length) return;
+    setMainIdx(idx);
+    setCompareIdx(-1);
+    trackEvent('select_model', {
+      model_name: MODELS[idx].nm,
+      provider: MODELS[idx].co,
+      source,
+    });
+  };
+  const handleCompareSelect = value => {
+    const idx = parseInt(value, 10);
+    const nextIdx = idx >= 0 && idx !== mainIdx ? idx : -1;
+    setCompareIdx(nextIdx);
+    if (nextIdx >= 0) {
+      trackEvent('model_compare', {
+        primary_model: m.nm,
+        compare_model: MODELS[nextIdx].nm,
+        compare_provider: MODELS[nextIdx].co,
+      });
+    } else {
+      trackEvent('model_compare_clear', { primary_model: m.nm });
+    }
+  };
+  const handleCompareClear = () => {
+    trackEvent('model_compare_clear', {
+      primary_model: m.nm,
+      compare_model: MODELS[compareIdx]?.nm,
+    });
+    setCompareIdx(-1);
+  };
 
   return(<>
     {pageHead}
@@ -116,15 +148,15 @@ export default function Home() {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 md:p-6 mb-4 md:mb-6">
           <div className="flex justify-center items-center gap-2 md:gap-3 mb-3 md:mb-4 text-xs md:text-sm flex-wrap">
             <span className="text-gray-500">{t('当前')}: <strong className="text-indigo-600">{m.nm}</strong></span><span className="text-gray-400 font-semibold">VS</span>
-            <select value={compareIdx} onChange={e=>{const v=parseInt(e.target.value);setCompareIdx(v>=0&&v===mainIdx?-1:v)}} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
+            <select value={compareIdx} onChange={e=>handleCompareSelect(e.target.value)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
               <option value="-1">{t('选择对比')}</option>{MODELS.map((mod,i)=>i!==mainIdx?<option key={i} value={i}>{mod.nm}</option>:null)}
             </select>
-            {compareIdx>=0&&<span className="text-xs text-indigo-600 cursor-pointer" onClick={()=>setCompareIdx(-1)}>VS {MODELS[compareIdx].nm} ✕</span>}
+            {compareIdx>=0&&<span className="text-xs text-indigo-600 cursor-pointer" onClick={handleCompareClear}>VS {MODELS[compareIdx].nm} ✕</span>}
           </div>
           <div className="flex flex-col xl:flex-row gap-5 items-start">
             <div className="w-full xl:w-[280px] flex-shrink-0 bg-gray-50 dark:bg-gray-700 rounded-xl border overflow-hidden max-h-[200px] md:max-h-[400px] xl:max-h-[600px] overflow-y-auto">
               <div className="px-4 py-3 text-sm font-bold text-gray-400 uppercase border-b sticky top-0 bg-gray-50 dark:bg-gray-700">{t('模型')} ({MODELS.length})</div>
-              {MODELS.map((mod,i)=>(<div key={i} onClick={()=>{setMainIdx(i);setCompareIdx(-1)}} className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 transition-colors ${i===mainIdx?'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 font-bold':'hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
+              {MODELS.map((mod,i)=>(<div key={i} onClick={()=>handleModelSelect(i, 'model_list')} className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 transition-colors ${i===mainIdx?'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 font-bold':'hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
                 <L mod={mod}/><span className="truncate flex-1">{mod.nm}</span><span className="text-xs px-2 py-0.5 rounded-full bg-white dark:bg-gray-700 text-gray-500">{mod.total.toFixed(1)}</span>
               </div>))}
             </div>
@@ -151,7 +183,19 @@ export default function Home() {
                     <div className="text-center mb-3"><div className="text-[52px] font-extrabold text-indigo-600">{m.total.toFixed(1)}</div><div className="text-sm text-gray-400">{t('综合评分')} /100</div></div>
                     <div className="flex items-center gap-2 text-sm mb-3"><L mod={m} s={16}/><strong className="text-gray-700 dark:text-gray-300">{m.co}</strong></div>
                     <div className="text-xs text-gray-600 leading-relaxed bg-white dark:bg-gray-800 rounded-lg p-3 mb-4">{m.de}</div>
-                    <a href={m.ur} target="_blank" className="block text-center py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">{t('访问官网')}</a>
+                    <a
+                      href={m.ur}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent('visit_model_site', {
+                        model_name: m.nm,
+                        provider: m.co,
+                        link_url: m.ur,
+                      })}
+                      className="block text-center py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700"
+                    >
+                      {t('访问官网')}
+                    </a>
                   </div>
                 )}
               </div>
@@ -162,14 +206,14 @@ export default function Home() {
         {/* Total Score Chart */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 md:p-6 mb-4 md:mb-6">
           <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 md:mb-4">{t('总分排名')}</h3>
-          <BarChart data={sortedByTotal.map((mod,i)=>({idx:MODELS.indexOf(mod),v:mod.total}))} height={280} onClick={setMainIdx}/>
+          <BarChart data={sortedByTotal.map((mod,i)=>({idx:MODELS.indexOf(mod),v:mod.total}))} height={280} onClick={(idx)=>handleModelSelect(idx, 'total_score_chart')}/>
         </div>
 
         {/* Dimension Charts */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
           {DIMS.map(d=>(
             <div key={d.k} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
-              <BarChart title={dimT(d)} data={[...MODELS].sort((a,b)=>getDim(b,d.k)-getDim(a,d.k)).slice(0,12).map(mod=>({idx:MODELS.indexOf(mod),v:getDim(mod,d.k)}))} height={180} onClick={(i)=>{const idx=MODELS.indexOf(MODELS.sort((a,b)=>getDim(b,d.k)-getDim(a,d.k))[i]);if(idx>=0)setMainIdx(idx)}}/>
+              <BarChart title={dimT(d)} data={[...MODELS].sort((a,b)=>getDim(b,d.k)-getDim(a,d.k)).slice(0,12).map(mod=>({idx:MODELS.indexOf(mod),v:getDim(mod,d.k)}))} height={180} onClick={(idx)=>handleModelSelect(idx, `dimension_${d.k}_chart`)}/>
             </div>
           ))}
         </div>

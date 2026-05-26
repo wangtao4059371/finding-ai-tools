@@ -1,12 +1,22 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { trackEvent, trackVisitProject } from '../lib/analytics';
 import { useLocale } from '../lib/i18n';
 
 export default function ToolCard({ tool }) {
   const locale = useLocale();
   
   return (
-    <Link href={`/tool/${tool.slug || tool.id}`}>
+    <Link
+      href={`/tool/${tool.slug || tool.id}`}
+      onClick={() => trackEvent('select_tool', {
+        tool_name: tool.name,
+        tool_slug: tool.slug || tool.id,
+        tool_category: tool.tag,
+        tool_type: tool.type,
+        source: 'tool_card',
+      })}
+    >
       <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer h-full flex flex-col justify-between relative overflow-hidden group">
         <div className={`absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-lg ${tool.type === 'Agent' ? 'bg-purple-600' : 'bg-blue-500'} text-white`}>
           {tool.type.toUpperCase()}
@@ -52,7 +62,12 @@ export default function ToolCard({ tool }) {
               <span className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">⭐ {tool.stars.toLocaleString()}</span>
             )}
           <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-800 dark:group-hover:text-indigo-300 transition-colors"
-            onClick={(e) => { e.preventDefault(); if(typeof gtag!=='undefined')gtag('event','visit_project',{tool_name:tool.name}); window.open(tool.url,'_blank'); }}>
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              trackVisitProject(tool, 'tool_card');
+              window.open(tool.url, '_blank', 'noopener,noreferrer');
+            }}>
             {locale === 'zh' ? '访问项目' : 'Visit'} →
           </span>
           </div>

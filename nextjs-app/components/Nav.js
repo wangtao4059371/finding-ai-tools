@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import { trackEvent } from '../lib/analytics';
 import { useLocale } from '../lib/i18n';
 
 export default function Nav() {
@@ -22,6 +23,7 @@ export default function Nav() {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
+    trackEvent('toggle_theme', { theme: next ? 'dark' : 'light' });
   };
 
   return (

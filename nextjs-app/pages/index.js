@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { getAllTools } from '../lib/api';
-import { getLocale, t } from '../lib/i18n';
+import { getLocale, translate } from '../lib/i18n';
 import Nav from '../components/Nav';
 import ToolCard from '../components/ToolCard';
 import FilterTags from '../components/FilterTags';
+import { trackEvent, trackSearch } from '../lib/analytics';
 
 const MODEL_DATA = [
   {nm:"Claude",ur:"https://claude.ai",total:77.02,math:85.71,hallucination:82.95,science:85.37,instruction:47.57,coding:71.15,agent:89.35},
@@ -64,6 +65,7 @@ export default function Tools({ tools }) {
   const [sortBy, setSortBy] = useState('default');
   const [showBackTop, setShowBackTop] = useState(false);
   const firstVisit = useRef(true);
+  const tr = key => translate(key, locale);
 
   useEffect(() => {
     setLocale(getLocale());
@@ -106,8 +108,60 @@ export default function Tools({ tools }) {
   const totalPages = Math.ceil(filteredTools.length / PAGE_SIZE);
   const paginatedTools = filteredTools.slice(0, page * PAGE_SIZE);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      trackSearch('search_tools', searchQuery, {
+        active_category: activeTag,
+        result_count: filteredTools.length,
+        sort_by: sortBy,
+      });
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [searchQuery, activeTag, sortBy, filteredTools.length]);
+
+  const handleSearchChange = value => {
+    setSearchQuery(value);
+    setPage(1);
+  };
+
+  const handleQuickFilter = value => {
+    const nextQuery = value === '全部' ? '' : value;
+    setSearchQuery(nextQuery);
+    setPage(1);
+    trackEvent('quick_filter_tools', {
+      filter_value: value,
+      result_count: filteredTools.length,
+    });
+  };
+
+  const handleSortChange = value => {
+    setSortBy(value);
+    setPage(1);
+    trackEvent('sort_tools', {
+      sort_by: value,
+      active_category: activeTag,
+      search_term: searchQuery.trim(),
+    });
+  };
+
+  const handleCategoryFilter = tag => {
+    setActiveTag(tag);
+    setPage(1);
+    trackEvent('filter_tools_category', {
+      category: tag,
+      search_term: searchQuery.trim(),
+    });
+  };
+
   const handleLoadMore = () => {
     setPage(p => p + 1);
+    trackEvent('load_more_tools', {
+      next_page: page + 1,
+      shown_count: paginatedTools.length,
+      total_results: filteredTools.length,
+      active_category: activeTag,
+      search_term: searchQuery.trim(),
+    });
   };
 
   const scrollToTop = () => {
@@ -126,7 +180,11 @@ export default function Tools({ tools }) {
       <Nav />
 
         {/* Hero Section */}
-        <a href="/ratings" className="block bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-950 py-12 md:py-16 border-b border-indigo-900/30 cursor-pointer group">
+        <a
+          href="/ratings"
+          onClick={() => trackEvent('select_rankings_hero', { source: 'home_hero' })}
+          className="block bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-950 py-12 md:py-16 border-b border-indigo-900/30 cursor-pointer group"
+        >
           <div className="max-w-5xl mx-auto px-4">
             {/* Title */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-white mb-3 tracking-tight">
@@ -222,7 +280,17 @@ export default function Tools({ tools }) {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {tools.filter(t=>t.slug).slice(0,3).map(tool => (
-                  <a key={tool.id} href={`/tool/${tool.slug}`} className="group">
+                  <a
+                    key={tool.id}
+                    href={`/tool/${tool.slug}`}
+                    onClick={() => trackEvent('select_featured_tool', {
+                      tool_name: tool.name,
+                      tool_slug: tool.slug,
+                      tool_category: tool.tag,
+                      source: 'home_featured',
+                    })}
+                    className="group"
+                  >
                     <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950 dark:via-purple-950 dark:to-pink-950 rounded-xl p-5 border border-indigo-100 dark:border-indigo-900 hover:shadow-lg transition-all group-hover:scale-[1.02] h-full">
                       <div className="flex items-center gap-3 mb-3">
                         <img src={tool.logo} alt="" className="w-10 h-10 rounded-lg" onError={e=>e.target.style.display='none'} />
@@ -253,16 +321,16 @@ export default function Tools({ tools }) {
               <div className="relative flex-1 w-full">
                 <input
                   type="text"
-                  placeholder={t('searchPlaceholder')}
+                  placeholder={tr('searchPlaceholder')}
                   value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
               </div>
               <select
                 value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+                onChange={(e) => handleSortChange(e.target.value)}
                 className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm"
               >
                 <option value="default">{locale === 'zh' ? '默认排序' : 'Default'}</option>
@@ -272,20 +340,20 @@ export default function Tools({ tools }) {
             </div>
             <div className="flex gap-2 flex-wrap items-center">
               {['全部','免费','付费','开源'].map(f => (
-                <button key={f} onClick={() => { setSearchQuery(f==='全部'?'':f); setPage(1); }}
+                <button key={f} onClick={() => handleQuickFilter(f)}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${searchQuery===f||(f==='全部'&&!searchQuery)?'bg-indigo-600 text-white shadow-sm':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
                   {f}
                 </button>
               ))}
               <span className="text-gray-300 dark:text-gray-600 mx-0.5">|</span>
               {['Agent','Tool'].map(t => (
-                <button key={t} onClick={() => { setSearchQuery(t); setPage(1); }}
+                <button key={t} onClick={() => handleQuickFilter(t)}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${searchQuery===t?'bg-indigo-600 text-white shadow-sm':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
                   {t}
                 </button>
               ))}
               {searchQuery && (
-                <button onClick={() => { setSearchQuery(''); setPage(1); }}
+                <button onClick={() => handleQuickFilter('全部')}
                   className="px-3 py-1.5 rounded-full text-xs font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                   ✕ {locale==='zh'?'清除':'Clear'}
                 </button>
@@ -298,9 +366,9 @@ export default function Tools({ tools }) {
         <main className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
           <aside className="w-full md:w-48 shrink-0">
             <h3 className="font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-xs mb-3">
-              {t('categories')}
+              {tr('categories')}
             </h3>
-            <FilterTags tags={tags} activeTag={activeTag} onFilter={(tag) => { setActiveTag(tag); setPage(1); }} locale={locale} />
+            <FilterTags tags={tags} activeTag={activeTag} onFilter={handleCategoryFilter} locale={locale} />
           </aside>
 
           <section className="flex-1">
@@ -313,7 +381,7 @@ export default function Tools({ tools }) {
                 ))}
               </div>
             ) : paginatedTools.length === 0 ? (
-              <p className="text-gray-400 dark:text-gray-500 col-span-full text-center py-8">{t('noResults')}</p>
+              <p className="text-gray-400 dark:text-gray-500 col-span-full text-center py-8">{tr('noResults')}</p>
             ) : (
               <>
                 <div className="mb-3 text-sm text-gray-500 dark:text-gray-400">
@@ -333,7 +401,7 @@ export default function Tools({ tools }) {
                       onClick={handleLoadMore}
                       className="px-8 py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all"
                     >
-                      {`${t('loadMore')} (${paginatedTools.length}/${filteredTools.length})`}
+                      {`${tr('loadMore')} (${paginatedTools.length}/${filteredTools.length})`}
                     </button>
                   </div>
                 )}
@@ -388,7 +456,7 @@ export default function Tools({ tools }) {
             </div>
           </div>
           <div className="max-w-7xl mx-auto px-4 mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 text-xs">
-            {t('footer')}
+            {tr('footer')}
           </div>
         </footer>
       </div>

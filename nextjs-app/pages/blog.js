@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Nav from '../components/Nav';
 import { getAllPosts, getCategories } from '../lib/blog';
 import { useLocale } from '../lib/i18n';
+import { trackEvent, trackSearch } from '../lib/analytics';
 
 function PostImage({ post, featured = false }) {
   return (
@@ -36,7 +37,16 @@ function PostCard({ post, locale }) {
   const excerpt = locale === 'zh' ? post.excerpt : (post.excerpt_en || post.excerpt);
 
   return (
-    <Link href={`/blog/${post.slug}`} className="group block h-full">
+    <Link
+      href={`/blog/${post.slug}`}
+      onClick={() => trackEvent('select_blog_post', {
+        post_title: post.title,
+        post_slug: post.slug,
+        post_category: post.category,
+        source: 'blog_card',
+      })}
+      className="group block h-full"
+    >
       <article className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800">
         <PostImage post={post} />
         <div className="flex min-w-0 flex-1 flex-col p-5">
@@ -71,6 +81,24 @@ export default function Blog({ posts, categories }) {
     });
   }, [activeCategory, query, regularPosts]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      trackSearch('search_blog', query, {
+        active_category: activeCategory,
+        result_count: filteredPosts.length,
+      });
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [query, activeCategory, filteredPosts.length]);
+
+  const handleCategoryChange = category => {
+    setActiveCategory(category);
+    trackEvent('filter_blog_category', {
+      category,
+      search_term: query.trim(),
+    });
+  };
+
   return (
     <>
       <Head>
@@ -103,7 +131,16 @@ export default function Blog({ posts, categories }) {
         <main className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 py-8">
           {featuredPost && (
             <section className="mb-8">
-              <Link href={`/blog/${featuredPost.slug}`} className="group block w-[calc(100vw-2rem)] max-w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:border-indigo-200 hover:shadow-md sm:w-full dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800">
+              <Link
+                href={`/blog/${featuredPost.slug}`}
+                onClick={() => trackEvent('select_blog_post', {
+                  post_title: featuredPost.title,
+                  post_slug: featuredPost.slug,
+                  post_category: featuredPost.category,
+                  source: 'blog_featured',
+                })}
+                className="group block w-[calc(100vw-2rem)] max-w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:border-indigo-200 hover:shadow-md sm:w-full dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800"
+              >
                 <article className="grid min-w-0 lg:grid-cols-[1.12fr_0.88fr]">
                   <PostImage post={featuredPost} featured />
                   <div className="flex min-w-0 flex-col justify-center p-6 md:p-8">
@@ -128,7 +165,7 @@ export default function Blog({ posts, categories }) {
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => setActiveCategory('all')}
+                  onClick={() => handleCategoryChange('all')}
                   className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${activeCategory === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'}`}
                 >
                   {t('全部', 'All')}
@@ -137,7 +174,7 @@ export default function Blog({ posts, categories }) {
                   <button
                     key={category}
                     type="button"
-                    onClick={() => setActiveCategory(category)}
+                    onClick={() => handleCategoryChange(category)}
                     className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${activeCategory === category ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'}`}
                   >
                     {category}

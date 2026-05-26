@@ -1,13 +1,32 @@
 import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
+import { useEffect } from 'react';
 import { getAllTools, getToolBySlug } from '../../lib/api';
 import { translate, useLocale } from '../../lib/i18n';
 import ToolCard from '../../components/ToolCard';
+import { trackEvent, trackVisitProject } from '../../lib/analytics';
+
+function formatStableDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toISOString().slice(0, 10);
+}
 
 export default function ToolDetail({ tool, relatedTools }) {
   const locale = useLocale();
   const t = key => translate(key, locale);
+
+  useEffect(() => {
+    if (!tool) return;
+    trackEvent('tool_detail_view', {
+      tool_name: tool.name,
+      tool_slug: tool.slug || tool.id,
+      tool_category: tool.tag,
+      tool_type: tool.type,
+      pricing: tool.pricing,
+    });
+  }, [tool]);
 
   if (!tool) {
     return (
@@ -108,7 +127,7 @@ export default function ToolDetail({ tool, relatedTools }) {
             )}
             {tool.content_updated && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                {locale === 'zh' ? '内容更新时间' : 'Last updated'}: {new Date(tool.content_updated).toLocaleDateString()}
+                {locale === 'zh' ? '内容更新时间' : 'Last updated'}: {formatStableDate(tool.content_updated)}
               </p>
             )}
 
@@ -121,7 +140,7 @@ export default function ToolDetail({ tool, relatedTools }) {
                 href={tool.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => { if (typeof gtag !== 'undefined') gtag('event', 'visit_project', { tool_name: tool.name }); }}
+                onClick={() => trackVisitProject(tool, 'tool_detail')}
                 className="w-full sm:w-auto text-center bg-indigo-600 dark:bg-indigo-500 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all font-semibold"
               >
                 {t('visitProject')} →

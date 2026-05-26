@@ -1,10 +1,12 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Nav from '../../components/Nav';
 import { getAdjacentPosts, getAllPosts, getPostBySlug, getRelatedPosts } from '../../lib/blog';
 import { useLocale } from '../../lib/i18n';
+import { trackEvent } from '../../lib/analytics';
 
 function getHeadings(content) {
   return content
@@ -37,7 +39,7 @@ function Meta({ post, locale }) {
   );
 }
 
-function Toc({ headings, title }) {
+function Toc({ headings, title, post, source }) {
   if (!headings.length) return null;
   return (
     <nav className="space-y-1 text-sm">
@@ -46,6 +48,12 @@ function Toc({ headings, title }) {
         <a
           key={heading.id}
           href={`#${heading.id}`}
+          onClick={() => trackEvent('blog_toc_click', {
+            post_title: post?.title,
+            post_slug: post?.slug,
+            heading_text: heading.text,
+            source,
+          })}
           className={`block rounded-md py-1.5 pr-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-indigo-400 ${heading.level === 3 ? 'pl-5' : 'pl-2 font-medium'}`}
         >
           {heading.text}
@@ -57,7 +65,15 @@ function Toc({ headings, title }) {
 
 function RelatedCard({ post, locale }) {
   return (
-    <Link href={`/blog/${post.slug}`} className="group block">
+    <Link
+      href={`/blog/${post.slug}`}
+      onClick={() => trackEvent('select_related_blog', {
+        post_title: post.title,
+        post_slug: post.slug,
+        post_category: post.category,
+      })}
+      className="group block"
+    >
       <article className="min-w-0 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800">
         <div className="aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-700">
           <img src={post.cover} alt={post.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
@@ -78,6 +94,11 @@ function AdjacentLink({ post, label, align = 'left' }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
+      onClick={() => trackEvent('select_adjacent_blog', {
+        post_title: post.title,
+        post_slug: post.slug,
+        direction: align === 'right' ? 'next' : 'previous',
+      })}
       className={`block rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800 ${align === 'right' ? 'text-right' : ''}`}
     >
       <span className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">{label}</span>
@@ -89,6 +110,38 @@ function AdjacentLink({ post, label, align = 'left' }) {
 export default function BlogPost({ post, relatedPosts, previousPost, nextPost }) {
   const locale = useLocale();
   const t = (zh, en) => locale === 'zh' ? zh : en;
+
+  useEffect(() => {
+    if (!post) return;
+
+    trackEvent('blog_detail_view', {
+      post_title: post.title,
+      post_slug: post.slug,
+      post_category: post.category,
+      reading_time_min: post.readingTime,
+    });
+
+    let sentReadDepth = false;
+    const onScroll = () => {
+      if (sentReadDepth) return;
+      const doc = document.documentElement;
+      const scrollableHeight = doc.scrollHeight - window.innerHeight;
+      const depth = scrollableHeight <= 0 ? 1 : window.scrollY / scrollableHeight;
+      if (depth >= 0.75) {
+        sentReadDepth = true;
+        trackEvent('blog_read_75', {
+          post_title: post.title,
+          post_slug: post.slug,
+          post_category: post.category,
+        });
+        window.removeEventListener('scroll', onScroll);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [post]);
 
   if (!post) {
     return (
@@ -194,7 +247,7 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
                         {t('文章目录', 'Contents')}
                       </summary>
                       <div className="mt-4">
-                        <Toc headings={headings} title="" />
+                        <Toc headings={headings} title="" post={post} source="mobile_toc" />
                       </div>
                     </details>
                   )}
@@ -205,7 +258,20 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
 
                   {post.source && (
                     <p className="mt-6 border-t border-gray-100 pt-5 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                      {t('原文出处', 'Source')}: <a href={post.source} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline dark:text-indigo-400">{post.source}</a>
+                      {t('原文出处', 'Source')}: <a
+                        href={post.source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent('blog_source_click', {
+                          post_title: post.title,
+                          post_slug: post.slug,
+                          post_category: post.category,
+                          link_url: post.source,
+                        })}
+                        className="text-indigo-600 hover:underline dark:text-indigo-400"
+                      >
+                        {post.source}
+                      </a>
                     </p>
                   )}
                 </div>
@@ -228,7 +294,7 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
 
             <aside className="hidden lg:block">
               <div className="sticky top-24 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <Toc headings={headings} title={t('文章目录', 'Contents')} />
+                <Toc headings={headings} title={t('文章目录', 'Contents')} post={post} source="desktop_toc" />
               </div>
             </aside>
           </div>
