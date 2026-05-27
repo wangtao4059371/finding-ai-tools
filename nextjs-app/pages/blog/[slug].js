@@ -26,7 +26,12 @@ function markdownText(children) {
   return Array.isArray(children) ? children.join('') : String(children || '');
 }
 
+function getPostTitle(post, locale) {
+  return locale === 'zh' ? post.title : (post.title_en || post.title);
+}
+
 function Meta({ post, locale }) {
+  const readingTime = locale === 'zh' ? post.readingTime : (post.readingTime_en || post.readingTime);
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
       <span className="rounded-md bg-indigo-50 px-2 py-1 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
@@ -37,7 +42,7 @@ function Meta({ post, locale }) {
         <span>{locale === 'zh' ? `更新 ${post.updated}` : `Updated ${post.updated}`}</span>
       )}
       <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-gray-600" />
-      <span>{locale === 'zh' ? `约 ${post.readingTime} 分钟` : `${post.readingTime} min read`}</span>
+      <span>{locale === 'zh' ? `约 ${readingTime} 分钟` : `${readingTime} min read`}</span>
     </div>
   );
 }
@@ -67,6 +72,7 @@ function Toc({ headings, title, post, source }) {
 }
 
 function RelatedCard({ post, locale }) {
+  const title = getPostTitle(post, locale);
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -79,12 +85,12 @@ function RelatedCard({ post, locale }) {
     >
       <article className="min-w-0 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800">
         <div className="aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-700">
-          <img src={post.cover} alt={post.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
+          <img src={post.cover} alt={title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
         </div>
         <div className="p-4">
           <Meta post={post} locale={locale} />
           <h3 className="mt-3 line-clamp-2 break-all text-base font-bold leading-snug text-gray-900 group-hover:text-indigo-600 sm:break-words dark:text-gray-100 dark:group-hover:text-indigo-400" style={{ overflowWrap: 'anywhere' }}>
-            {post.title}
+            {title}
           </h3>
         </div>
       </article>
@@ -92,8 +98,9 @@ function RelatedCard({ post, locale }) {
   );
 }
 
-function AdjacentLink({ post, label, align = 'left' }) {
+function AdjacentLink({ post, label, locale, align = 'left' }) {
   if (!post) return <div />;
+  const title = getPostTitle(post, locale);
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -105,7 +112,7 @@ function AdjacentLink({ post, label, align = 'left' }) {
       className={`block rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800 ${align === 'right' ? 'text-right' : ''}`}
     >
       <span className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">{label}</span>
-      <p className="mt-2 line-clamp-2 break-all text-sm font-semibold text-gray-900 sm:break-words dark:text-gray-100" style={{ overflowWrap: 'anywhere' }}>{post.title}</p>
+      <p className="mt-2 line-clamp-2 break-all text-sm font-semibold text-gray-900 sm:break-words dark:text-gray-100" style={{ overflowWrap: 'anywhere' }}>{title}</p>
     </Link>
   );
 }
@@ -159,6 +166,7 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
   const zhContent = parts[0] || post.content;
   const enContent = parts.length > 1 ? '## English Version' + parts[1] : '';
   const displayContent = locale === 'zh' ? zhContent : (enContent || zhContent);
+  const displayTitle = getPostTitle(post, locale);
   const displayExcerpt = locale === 'zh' ? post.excerpt : (post.excerpt_en || post.excerpt);
   const headings = getHeadings(displayContent);
   let headingIndex = 0;
@@ -167,7 +175,7 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: post.title,
+    headline: displayTitle,
     description: displayExcerpt,
     image: imageUrl,
     datePublished: post.date,
@@ -209,14 +217,14 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
   return (
     <>
       <Head>
-        <title>{`${post.title} - Finding AI Tools`}</title>
+        <title>{`${displayTitle} - Finding AI Tools`}</title>
         <meta name="description" content={displayExcerpt} />
-        <meta property="og:title" content={post.title} />
+        <meta property="og:title" content={displayTitle} />
         <meta property="og:description" content={displayExcerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:image" content={imageUrl} />
         <meta property="article:published_time" content={post.date} />
-        <meta property="article:modified_time" content={post.date} />
+        <meta property="article:modified_time" content={post.updated || post.date} />
         <link rel="canonical" href={canonicalUrl} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       </Head>
@@ -235,12 +243,12 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
             <article className="min-w-0">
               <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                 <div className="aspect-[16/9] bg-gray-100 dark:bg-gray-700">
-                  <img src={post.cover} alt={post.title} className="h-full w-full object-cover" loading="eager" />
+                  <img src={post.cover} alt={displayTitle} className="h-full w-full object-cover" loading="eager" />
                 </div>
                 <div className="p-6 md:p-10">
                   <Meta post={post} locale={locale} />
                   <h1 className="mt-4 break-all text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:break-words dark:text-gray-100 md:text-4xl" style={{ overflowWrap: 'anywhere' }}>
-                    {post.title}
+                    {displayTitle}
                   </h1>
                   <p className="mt-4 break-all text-base leading-7 text-gray-600 sm:break-words dark:text-gray-400">{displayExcerpt}</p>
 
@@ -281,8 +289,8 @@ export default function BlogPost({ post, relatedPosts, previousPost, nextPost })
               </div>
 
               <div className="mt-8 grid gap-4 md:grid-cols-2">
-                <AdjacentLink post={previousPost} label={t('上一篇', 'Previous')} />
-                <AdjacentLink post={nextPost} label={t('下一篇', 'Next')} align="right" />
+                <AdjacentLink post={previousPost} label={t('上一篇', 'Previous')} locale={locale} />
+                <AdjacentLink post={nextPost} label={t('下一篇', 'Next')} locale={locale} align="right" />
               </div>
 
               {relatedPosts.length > 0 && (

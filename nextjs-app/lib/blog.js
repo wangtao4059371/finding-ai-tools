@@ -23,6 +23,14 @@ function estimateReadingTime(content) {
   return minutes;
 }
 
+function splitLocalizedContent(content) {
+  const parts = content.split('---\n\n## English Version');
+  return {
+    zh: parts[0] || content,
+    en: parts.length > 1 ? parts[1] : '',
+  };
+}
+
 function getCover(data, content) {
   return data.cover || firstMarkdownImage(content) || DEFAULT_COVER;
 }
@@ -44,9 +52,13 @@ export function getHeadingsFromMarkdown(content) {
 function postFromFile(file, { includeContent = false } = {}) {
   const raw = fs.readFileSync(path.join(blogDir, file), 'utf-8');
   const { data, content } = matter(raw);
+  const localizedContent = splitLocalizedContent(content);
+  const zhReadingTime = estimateReadingTime(localizedContent.zh);
+  const enReadingTime = localizedContent.en ? estimateReadingTime(localizedContent.en) : zhReadingTime;
   const post = {
     slug: file.replace('.md', ''),
     title: data.title || '',
+    title_en: data.title_en || '',
     date: data.date || '',
     updated: data.updated || data.date || '',
     excerpt: data.excerpt || '',
@@ -54,7 +66,8 @@ function postFromFile(file, { includeContent = false } = {}) {
     category: data.category || '',
     cover: getCover(data, content),
     source: data.source || '',
-    readingTime: estimateReadingTime(content),
+    readingTime: zhReadingTime,
+    readingTime_en: enReadingTime,
   };
 
   if (includeContent) {

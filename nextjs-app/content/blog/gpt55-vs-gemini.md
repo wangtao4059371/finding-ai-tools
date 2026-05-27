@@ -1,5 +1,6 @@
 ---
 title: "GPT-5.5 vs Gemini 3.1 Pro 终极对比：性能、成本、隐私全面评测"
+title_en: "GPT-5.5 vs Gemini 3.1 Pro: Performance, Cost, and Privacy Compared"
 date: "2026-05-24"
 excerpt: "OpenAI GPT-5.5与Google Gemini 3.1 Pro旗舰对比。从MMLU、编码基准、上下文窗口、API成本到隐私政策，一篇文章看透两大模型的优劣。"
 excerpt_en: "Comprehensive comparison of OpenAI GPT-5.5 vs Google Gemini 3.1 Pro. Benchmarks, coding, context windows, API costs, and privacy policies analyzed side by side."

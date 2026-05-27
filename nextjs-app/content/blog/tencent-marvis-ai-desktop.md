@@ -1,5 +1,6 @@
 ---
 title: "腾讯 Marvis 深度体验：AI桌面助手的全新形态"
+title_en: "Tencent Marvis Review: A New Form of AI Desktop Assistant"
 date: "2026-05-24"
 excerpt: "腾讯推出的AI桌面助手Marvis，支持本地大模型隐私模式、手机远程操控电脑、AI文件搜索、一句话改系统设置。Windows/macOS/Android全平台覆盖。"
 excerpt_en: "Tencent's Marvis is a new AI desktop assistant with local LLM privacy mode, remote PC control via phone, AI file search, and natural language system settings. Available on Windows, macOS, and Android."

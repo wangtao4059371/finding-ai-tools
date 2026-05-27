@@ -6,12 +6,17 @@ import { getAllPosts, getCategories } from '../lib/blog';
 import { useLocale } from '../lib/i18n';
 import { trackEvent, trackSearch } from '../lib/analytics';
 
-function PostImage({ post, featured = false }) {
+function getPostTitle(post, locale) {
+  return locale === 'zh' ? post.title : (post.title_en || post.title);
+}
+
+function PostImage({ post, featured = false, locale }) {
+  const title = getPostTitle(post, locale);
   return (
     <div className={`relative min-w-0 overflow-hidden bg-gray-100 dark:bg-gray-700 ${featured ? 'aspect-[16/9] lg:aspect-[5/3]' : 'aspect-[16/9]'}`}>
       <img
         src={post.cover}
-        alt={post.title}
+        alt={title}
         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         loading={featured ? 'eager' : 'lazy'}
       />
@@ -21,6 +26,7 @@ function PostImage({ post, featured = false }) {
 }
 
 function Meta({ post, locale }) {
+  const readingTime = locale === 'zh' ? post.readingTime : (post.readingTime_en || post.readingTime);
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
       <span className="rounded-md bg-indigo-50 px-2 py-1 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
@@ -31,12 +37,13 @@ function Meta({ post, locale }) {
         <span>{locale === 'zh' ? `更新 ${post.updated}` : `Updated ${post.updated}`}</span>
       )}
       <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-gray-600" />
-      <span>{locale === 'zh' ? `约 ${post.readingTime} 分钟` : `${post.readingTime} min read`}</span>
+      <span>{locale === 'zh' ? `约 ${readingTime} 分钟` : `${readingTime} min read`}</span>
     </div>
   );
 }
 
 function PostCard({ post, locale }) {
+  const title = getPostTitle(post, locale);
   const excerpt = locale === 'zh' ? post.excerpt : (post.excerpt_en || post.excerpt);
 
   return (
@@ -51,11 +58,11 @@ function PostCard({ post, locale }) {
       className="group block h-full"
     >
       <article className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800">
-        <PostImage post={post} />
+        <PostImage post={post} locale={locale} />
         <div className="flex min-w-0 flex-1 flex-col p-5">
           <Meta post={post} locale={locale} />
           <h2 className="mt-3 line-clamp-2 break-all text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-indigo-600 sm:break-words dark:text-gray-100 dark:group-hover:text-indigo-400" style={{ overflowWrap: 'anywhere' }}>
-            {post.title}
+            {title}
           </h2>
           <p className="mt-3 line-clamp-3 break-all text-sm leading-6 text-gray-600 sm:break-words dark:text-gray-400">{excerpt}</p>
           <span className="mt-5 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
@@ -79,7 +86,7 @@ export default function Blog({ posts, categories }) {
     const normalizedQuery = query.trim().toLowerCase();
     return regularPosts.filter(post => {
       const matchesCategory = activeCategory === 'all' || post.category === activeCategory;
-      const haystack = `${post.title} ${post.excerpt} ${post.excerpt_en || ''} ${post.category}`.toLowerCase();
+      const haystack = `${post.title} ${post.title_en || ''} ${post.excerpt} ${post.excerpt_en || ''} ${post.category}`.toLowerCase();
       return matchesCategory && (!normalizedQuery || haystack.includes(normalizedQuery));
     });
   }, [activeCategory, query, regularPosts]);
@@ -145,11 +152,11 @@ export default function Blog({ posts, categories }) {
                 className="group block w-[calc(100vw-2rem)] max-w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all hover:border-indigo-200 hover:shadow-md sm:w-full dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800"
               >
                 <article className="grid min-w-0 lg:grid-cols-[1.12fr_0.88fr]">
-                  <PostImage post={featuredPost} featured />
+                  <PostImage post={featuredPost} featured locale={locale} />
                   <div className="flex min-w-0 flex-col justify-center p-6 md:p-8">
                     <Meta post={featuredPost} locale={locale} />
                     <h2 className="mt-4 break-all text-xl font-bold leading-snug text-gray-900 transition-colors group-hover:text-indigo-600 sm:break-words sm:text-2xl dark:text-gray-100 dark:group-hover:text-indigo-400 md:text-3xl" style={{ overflowWrap: 'anywhere' }}>
-                      {featuredPost.title}
+                      {getPostTitle(featuredPost, locale)}
                     </h2>
                     <p className="mt-4 line-clamp-4 break-all text-sm leading-6 text-gray-600 sm:break-words dark:text-gray-400 md:text-base">
                       {locale === 'zh' ? featuredPost.excerpt : (featuredPost.excerpt_en || featuredPost.excerpt)}

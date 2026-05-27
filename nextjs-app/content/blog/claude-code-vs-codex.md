@@ -1,5 +1,6 @@
 ---
 title: "Claude Code vs Codex 终极对比：开发者实测报告 2026"
+title_en: "Claude Code vs Codex: Developer Field Test Report 2026"
 date: "2026-05-21"
 excerpt: "基于数月实测，从任务完成跨度、Token效率、生态粘性到RAG Pipeline案例，深度对比Claude Code与Codex。结论：没有绝对错误的选择，但Anthropic生态和100美元中档让Claude Code更香。"
 excerpt_en: "Based on months of real-world testing, this deep dive compares Claude Code vs Codex across task completion horizons, token efficiency, ecosystem stickiness, and a RAG pipeline case study. Verdict: no wrong choice, but Anthropic's ecosystem and $100 tier tip the scale."
