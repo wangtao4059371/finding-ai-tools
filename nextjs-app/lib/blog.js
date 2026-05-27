@@ -48,6 +48,7 @@ function postFromFile(file, { includeContent = false } = {}) {
     slug: file.replace('.md', ''),
     title: data.title || '',
     date: data.date || '',
+    updated: data.updated || data.date || '',
     excerpt: data.excerpt || '',
     excerpt_en: data.excerpt_en || '',
     category: data.category || '',

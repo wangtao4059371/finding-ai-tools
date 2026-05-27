@@ -27,6 +27,9 @@ function Meta({ post, locale }) {
         {post.category}
       </span>
       <span>{post.date}</span>
+      {post.updated && post.updated !== post.date && (
+        <span>{locale === 'zh' ? `更新 ${post.updated}` : `Updated ${post.updated}`}</span>
+      )}
       <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-gray-600" />
       <span>{locale === 'zh' ? `约 ${post.readingTime} 分钟` : `${post.readingTime} min read`}</span>
     </div>
