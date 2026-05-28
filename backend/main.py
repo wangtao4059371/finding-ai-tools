@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Any, List, Optional
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,7 +21,68 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_FILE = "tools.db"
+DB_FILE = os.getenv("TOOLS_DB_PATH", "tools.db")
+
+GITHUB_RE = re.compile(r"github\.com/([^/\s?#]+)/([^/\s?#]+)")
+FAVICON_URL = "https://www.google.com/s2/favicons?domain={domain}&sz=128"
+
+
+def parse_github_repo(url: str):
+    if not url:
+        return None, None
+    match = GITHUB_RE.search(url)
+    if not match:
+        return None, None
+    owner = match.group(1)
+    repo = match.group(2).removesuffix(".git")
+    return owner, repo
+
+
+def normalize_topics(value: Any) -> str:
+    if not value:
+        return ""
+    if isinstance(value, list):
+        return ",".join(str(item).strip() for item in value if str(item).strip())
+    return str(value).strip()
+
+
+def favicon_for_url(url: str) -> str:
+    if not url:
+        return ""
+    try:
+        domain = re.sub(r"^https?://", "", url).split("/")[0]
+        return FAVICON_URL.format(domain=domain)
+    except Exception:
+        return ""
+
+
+def normalize_tool_data(data: dict) -> dict:
+    normalized = dict(data)
+    owner, repo = parse_github_repo(normalized.get("github_url") or normalized.get("url") or "")
+    if owner and repo:
+        current_logo = normalized.get("logo") or ""
+        current_logo_is_avatar = (
+            "avatars.githubusercontent.com" in current_logo
+            or re.match(r"^https://github\.com/[^/]+\.png", current_logo)
+        )
+        normalized["owner_login"] = normalized.get("owner_login") or owner
+        normalized["repo_name"] = normalized.get("repo_name") or repo
+        normalized["github_url"] = normalized.get("github_url") or f"https://github.com/{owner}/{repo}"
+        normalized["owner_avatar_url"] = (
+            normalized.get("owner_avatar_url")
+            or (current_logo if current_logo_is_avatar else "")
+            or f"https://github.com/{owner}.png"
+        )
+        normalized["logo"] = normalized["owner_avatar_url"]
+        normalized["repo_image_url"] = (
+            normalized.get("repo_image_url")
+            or f"https://opengraph.githubassets.com/1/{owner}/{repo}"
+        )
+    elif not normalized.get("logo"):
+        normalized["logo"] = favicon_for_url(normalized.get("url", ""))
+
+    normalized["topics"] = normalize_topics(normalized.get("topics"))
+    return normalized
 
 def make_slug(name: str) -> str:
     slug = name.lower()
@@ -44,13 +105,43 @@ def init_db():
             framework TEXT,
             pricing TEXT,
             description TEXT,
-            slug TEXT
+            slug TEXT,
+            content TEXT,
+            stars INTEGER DEFAULT 0,
+            content_updated TEXT,
+            owner_login TEXT,
+            owner_avatar_url TEXT,
+            repo_name TEXT,
+            github_url TEXT,
+            forks INTEGER DEFAULT 0,
+            language TEXT,
+            license TEXT,
+            topics TEXT,
+            pushed_at TEXT,
+            repo_image_url TEXT
         )
     ''')
-    try:
-        cursor.execute('ALTER TABLE tools ADD COLUMN slug TEXT')
-    except:
-        pass
+    columns = {
+        "slug": "TEXT",
+        "content": "TEXT",
+        "stars": "INTEGER DEFAULT 0",
+        "content_updated": "TEXT",
+        "owner_login": "TEXT",
+        "owner_avatar_url": "TEXT",
+        "repo_name": "TEXT",
+        "github_url": "TEXT",
+        "forks": "INTEGER DEFAULT 0",
+        "language": "TEXT",
+        "license": "TEXT",
+        "topics": "TEXT",
+        "pushed_at": "TEXT",
+        "repo_image_url": "TEXT",
+    }
+    cursor.execute("PRAGMA table_info(tools)")
+    existing = {row[1] for row in cursor.fetchall()}
+    for name, definition in columns.items():
+        if name not in existing:
+            cursor.execute(f"ALTER TABLE tools ADD COLUMN {name} {definition}")
     conn.commit()
     conn.close()
 
@@ -62,7 +153,7 @@ def read_index():
 
 class ToolSchema(BaseModel):
     name: str
-    logo: str
+    logo: Optional[str] = ""
     url: str
     type: str
     tag: str
@@ -72,6 +163,20 @@ class ToolSchema(BaseModel):
     description: str
     content: Optional[str] = ""
     stars: Optional[int] = 0
+    owner_login: Optional[str] = None
+    owner_avatar_url: Optional[str] = None
+    repo_name: Optional[str] = None
+    github_url: Optional[str] = None
+    forks: Optional[int] = 0
+    language: Optional[str] = None
+    license: Optional[str] = None
+    topics: Optional[Any] = None
+    pushed_at: Optional[str] = None
+    repo_image_url: Optional[str] = None
+
+
+def rows_to_dicts(rows):
+    return [normalize_tool_data(dict(row)) for row in rows]
 
 @app.get("/api/tools", response_model=List[dict])
 def get_tools():
@@ -81,7 +186,25 @@ def get_tools():
     cursor.execute("SELECT * FROM tools ORDER BY id DESC")
     rows = cursor.fetchall()
     conn.close()
-    return [dict(row) for row in rows]
+    return rows_to_dicts(rows)
+
+
+@app.get("/api/tools/summary", response_model=List[dict])
+def get_tools_summary():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id, name, logo, url, type, tag, base_model, framework, pricing,
+               description, slug, stars, content_updated, owner_login,
+               owner_avatar_url, repo_name, github_url, forks, language,
+               license, topics, pushed_at, repo_image_url
+        FROM tools
+        ORDER BY id DESC
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+    return rows_to_dicts(rows)
 
 @app.get("/api/tools/id/{tool_id}", response_model=dict)
 def get_tool_by_id(tool_id: int):
@@ -93,7 +216,7 @@ def get_tool_by_id(tool_id: int):
     conn.close()
     if row is None:
         raise HTTPException(status_code=404, detail="工具不存在")
-    return dict(row)
+    return normalize_tool_data(dict(row))
 
 @app.get("/api/tools/{slug}", response_model=dict)
 def get_tool_by_slug(slug: str):
@@ -105,7 +228,7 @@ def get_tool_by_slug(slug: str):
     conn.close()
     if row is None:
         raise HTTPException(status_code=404, detail="工具不存在")
-    return dict(row)
+    return normalize_tool_data(dict(row))
 
 @app.patch("/api/tools/{tool_name}/content")
 def update_tool_content(tool_name: str, data: dict):
@@ -113,7 +236,8 @@ def update_tool_content(tool_name: str, data: dict):
     cursor = conn.cursor()
     try:
         content = data.get("content", "")
-        cursor.execute("UPDATE tools SET content = ? WHERE name = ?", (content, tool_name))
+        now = datetime.now().isoformat()
+        cursor.execute("UPDATE tools SET content = ?, content_updated = ? WHERE name = ?", (content, now, tool_name))
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="工具不存在")
         conn.commit()
@@ -140,18 +264,55 @@ def add_tool(tool: ToolSchema):
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT id FROM tools WHERE name = ? OR url = ?", (tool.name, tool.url))
-        if cursor.fetchone():
-            return {"status": "skipped", "message": f"产品 [{tool.name}] 已经存在数据库中，直接跳过。"}
+        payload = normalize_tool_data(tool.model_dump())
+        cursor.execute("SELECT id FROM tools WHERE name = ? OR url = ?", (payload["name"], payload["url"]))
+        existing = cursor.fetchone()
+        if existing:
+            metadata_fields = [
+                "logo", "stars", "owner_login", "owner_avatar_url", "repo_name",
+                "github_url", "forks", "language", "license", "topics",
+                "pushed_at", "repo_image_url"
+            ]
+            updates = []
+            values = []
+            for field in metadata_fields:
+                value = payload.get(field)
+                if value not in (None, ""):
+                    updates.append(f"{field} = ?")
+                    values.append(value)
+            if updates:
+                values.append(existing[0])
+                cursor.execute(f"UPDATE tools SET {', '.join(updates)} WHERE id = ?", values)
+                conn.commit()
+            return {"status": "skipped", "message": f"产品 [{payload['name']}] 已存在，已补充元数据。"}
         
-        slug = make_slug(tool.name)
+        slug = make_slug(payload["name"])
         now = datetime.now().isoformat()
+        columns = [
+            "name", "logo", "url", "type", "tag", "base_model", "framework",
+            "pricing", "description", "slug", "content", "stars",
+            "content_updated", "owner_login", "owner_avatar_url", "repo_name",
+            "github_url", "forks", "language", "license", "topics",
+            "pushed_at", "repo_image_url"
+        ]
+        values = [
+            payload.get("name"), payload.get("logo"), payload.get("url"),
+            payload.get("type"), payload.get("tag"), payload.get("base_model"),
+            payload.get("framework"), payload.get("pricing"),
+            payload.get("description"), slug, payload.get("content") or "",
+            payload.get("stars") or 0, now, payload.get("owner_login"),
+            payload.get("owner_avatar_url"), payload.get("repo_name"),
+            payload.get("github_url"), payload.get("forks") or 0,
+            payload.get("language"), payload.get("license"),
+            payload.get("topics"), payload.get("pushed_at"),
+            payload.get("repo_image_url")
+        ]
         cursor.execute(
-            "INSERT INTO tools (name, logo, url, type, tag, base_model, framework, pricing, description, slug, stars, content_updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (tool.name, tool.logo, tool.url, tool.type, tool.tag, tool.base_model, tool.framework, tool.pricing, tool.description, slug, tool.stars, now)
+            f"INSERT INTO tools ({', '.join(columns)}) VALUES ({', '.join(['?'] * len(columns))})",
+            values
         )
         conn.commit()
-        return {"status": "success", "message": f"产品 [{tool.name}] 录入成功！"}
+        return {"status": "success", "message": f"产品 [{payload['name']}] 录入成功！"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:

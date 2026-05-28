@@ -37,6 +37,10 @@ const pt = (mi,cx,cy) => DIMS6.map((k,i)=>{
 
 const PAGE_SIZE = 12;
 
+function toolLogo(tool) {
+  return tool.owner_avatar_url || tool.logo || '/favicon.svg';
+}
+
 function SkeletonCard() {
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-[350px] animate-pulse">
@@ -94,7 +98,11 @@ export default function Tools({ tools }) {
       tool.name.toLowerCase().includes(q.toLowerCase()) ||
       tool.description.toLowerCase().includes(q.toLowerCase()) ||
       tool.pricing.toLowerCase().includes(q.toLowerCase()) ||
-      tool.type.toLowerCase() === q.toLowerCase()
+      tool.type.toLowerCase() === q.toLowerCase() ||
+      (tool.owner_login || '').toLowerCase().includes(q.toLowerCase()) ||
+      (tool.repo_name || '').toLowerCase().includes(q.toLowerCase()) ||
+      (tool.language || '').toLowerCase().includes(q.toLowerCase()) ||
+      (tool.topics || '').toLowerCase().includes(q.toLowerCase())
     );
   }
 
@@ -293,7 +301,7 @@ export default function Tools({ tools }) {
                   >
                     <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950 dark:via-purple-950 dark:to-pink-950 rounded-xl p-5 border border-indigo-100 dark:border-indigo-900 hover:shadow-lg transition-all group-hover:scale-[1.02] h-full">
                       <div className="flex items-center gap-3 mb-3">
-                        <img src={tool.logo} alt="" className="w-10 h-10 rounded-lg" onError={e=>e.target.style.display='none'} />
+                        <img src={toolLogo(tool)} alt="" className="w-10 h-10 rounded-lg" onError={e=>e.target.style.display='none'} />
                         <div>
                           <div className="font-bold text-gray-900 dark:text-gray-100 text-sm">{tool.name}</div>
                           <span className="text-xs text-gray-500">#{tool.tag}</span>

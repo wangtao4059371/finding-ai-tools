@@ -13,6 +13,28 @@ function formatStableDate(value) {
   return date.toISOString().slice(0, 10);
 }
 
+function toolLogo(tool) {
+  return tool.owner_avatar_url || tool.logo || '/favicon.svg';
+}
+
+function githubPath(tool) {
+  if (tool.owner_login && tool.repo_name) return `${tool.owner_login}/${tool.repo_name}`;
+  try {
+    const url = new URL(tool.github_url || tool.url);
+    if (url.hostname !== 'github.com') return '';
+    const [owner, repo] = url.pathname.split('/').filter(Boolean);
+    return owner && repo ? `${owner}/${repo.replace(/\.git$/, '')}` : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function topicsList(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.filter(Boolean);
+  return String(value).split(',').map(item => item.trim()).filter(Boolean);
+}
+
 export default function ToolDetail({ tool, relatedTools }) {
   const locale = useLocale();
   const t = key => translate(key, locale);
@@ -44,6 +66,8 @@ export default function ToolDetail({ tool, relatedTools }) {
     url: `https://findingaitools.com/tool/${tool.slug}`,
   };
   const canonicalUrl = `https://findingaitools.com/tool/${tool.slug}`;
+  const repoPath = githubPath(tool);
+  const topics = topicsList(tool.topics).slice(0, 8);
 
   return (
     <>
@@ -84,7 +108,7 @@ export default function ToolDetail({ tool, relatedTools }) {
           <article className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 transition-all animate-fade-in">
             <div className="flex items-center gap-4 mb-6">
               <Image
-                src={tool.logo}
+                src={toolLogo(tool)}
                 alt={tool.name}
                 width={80}
                 height={80}
@@ -94,6 +118,9 @@ export default function ToolDetail({ tool, relatedTools }) {
               />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{tool.name}</h1>
+                {repoPath && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{repoPath}</p>
+                )}
                 <span className={`inline-block mt-2 px-3 py-1 text-sm font-bold rounded-lg ${
                   tool.type === 'Agent' 
                     ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' 
@@ -105,6 +132,37 @@ export default function ToolDetail({ tool, relatedTools }) {
             </div>
 
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6 text-lg">{tool.description}</p>
+
+            {repoPath && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div>
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 block mb-1">Stars</span>
+                  <p className="text-gray-900 dark:text-gray-100 font-medium">{tool.stars > 0 ? tool.stars.toLocaleString() : '-'}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 block mb-1">Forks</span>
+                  <p className="text-gray-900 dark:text-gray-100 font-medium">{tool.forks > 0 ? tool.forks.toLocaleString() : '-'}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 block mb-1">{locale === 'zh' ? '语言' : 'Language'}</span>
+                  <p className="text-gray-900 dark:text-gray-100 font-medium">{tool.language || '-'}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 block mb-1">{locale === 'zh' ? '最近更新' : 'Updated'}</span>
+                  <p className="text-gray-900 dark:text-gray-100 font-medium">{tool.pushed_at ? formatStableDate(tool.pushed_at) : '-'}</p>
+                </div>
+              </div>
+            )}
+
+            {topics.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {topics.map(topic => (
+                  <span key={topic} className="px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    {topic}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {tool.type === 'Agent' && (
               <div className="grid grid-cols-2 gap-4 mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
@@ -134,6 +192,9 @@ export default function ToolDetail({ tool, relatedTools }) {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100 dark:border-gray-700">
               <div className="flex flex-col gap-2">
                 <span className="text-gray-500 dark:text-gray-400">{locale === 'zh' ? '分类' : 'Category'}: <span className="text-indigo-600 dark:text-indigo-400">#{tool.tag}</span></span>
+                {repoPath && tool.license && (
+                  <span className="text-gray-500 dark:text-gray-400">License: <span className="text-gray-700 dark:text-gray-300">{tool.license}</span></span>
+                )}
                 <span className="text-green-600 dark:text-green-400 font-medium">{tool.pricing}</span>
               </div>
               <a

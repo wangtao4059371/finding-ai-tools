@@ -5,7 +5,7 @@ import time
 import requests
 from openai import OpenAI
 from dotenv import load_dotenv
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 load_dotenv()
 
@@ -16,6 +16,8 @@ if not API_KEY:
 BASE_URL = "https://api.deepseek.com/v1"
 client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 LOCAL_SITE_URL = "http://127.0.0.1:8001/api/tools/add"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_RE = re.compile(r"github\.com/([^/\s?#]+)/([^/\s?#]+)")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -30,6 +32,101 @@ HEADERS = {
     "Sec-Fetch-User": "?1",
     "Cache-Control": "max-age=0",
 }
+
+
+def github_headers() -> dict:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "findingaitools/1.0",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+    return headers
+
+
+def parse_github_repo(url: str):
+    if not url:
+        return None, None
+    match = GITHUB_RE.search(url)
+    if not match:
+        return None, None
+    return match.group(1), match.group(2).removesuffix(".git")
+
+
+def int_or_zero(value: Any) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
+def github_metadata_from_raw(raw_text: str) -> Dict[str, Any]:
+    def line_value(label: str) -> str:
+        match = re.search(rf"^{re.escape(label)}:\s*(.*)$", raw_text, re.MULTILINE)
+        return match.group(1).strip() if match else ""
+
+    github_url = line_value("Link")
+    owner = line_value("Owner")
+    repo = line_value("Repository").strip('"')
+    parsed_owner, parsed_repo = parse_github_repo(github_url)
+    owner = owner or parsed_owner or ""
+    repo = repo or parsed_repo or ""
+    if not owner or not repo:
+        return {}
+
+    language = ""
+    stars = 0
+    language_line = line_value("Language")
+    if language_line:
+        language_match = re.match(r"([^,]+),\s*Stars:\s*(\d+)", language_line)
+        if language_match:
+            language = language_match.group(1).strip()
+            stars = int_or_zero(language_match.group(2))
+        else:
+            language = language_line
+
+    topics = line_value("Topics")
+    if topics == "无":
+        topics = ""
+
+    owner_avatar_url = line_value("Owner Avatar") or f"https://github.com/{owner}.png"
+
+    return {
+        "logo": owner_avatar_url,
+        "stars": stars,
+        "owner_login": owner,
+        "owner_avatar_url": owner_avatar_url,
+        "repo_name": repo,
+        "github_url": github_url or f"https://github.com/{owner}/{repo}",
+        "forks": int_or_zero(line_value("Forks")),
+        "language": language if language != "多种语言" else "",
+        "license": line_value("License"),
+        "topics": topics,
+        "pushed_at": line_value("Last Push"),
+        "repo_image_url": f"https://opengraph.githubassets.com/1/{owner}/{repo}",
+    }
+
+
+def normalize_structured_data(data: dict, raw_text: str) -> dict:
+    normalized = dict(data)
+    github_meta = github_metadata_from_raw(raw_text)
+    if not github_meta:
+        owner, repo = parse_github_repo(normalized.get("url", ""))
+        if owner and repo:
+            github_meta = {
+                "logo": f"https://github.com/{owner}.png",
+                "owner_login": owner,
+                "owner_avatar_url": f"https://github.com/{owner}.png",
+                "repo_name": repo,
+                "github_url": f"https://github.com/{owner}/{repo}",
+                "repo_image_url": f"https://opengraph.githubassets.com/1/{owner}/{repo}",
+            }
+
+    for key, value in github_meta.items():
+        if value not in (None, ""):
+            normalized[key] = value
+    return normalized
 
 
 def fetch_product_hunt_scrape() -> List[str]:
@@ -220,11 +317,7 @@ def fetch_github_trending() -> List[str]:
                 "order": "desc",
                 "per_page": 100
             }
-            headers = {
-                "Accept": "application/vnd.github.v3+json",
-                "User-Agent": "findingaitools/1.0"
-            }
-            response = requests.get(url, params=params, headers=headers, timeout=15)
+            response = requests.get(url, params=params, headers=github_headers(), timeout=15)
             response.raise_for_status()
             items = response.json().get("items", [])
             all_items.extend(items[:50])
@@ -243,12 +336,20 @@ def fetch_github_trending() -> List[str]:
     
     raw_texts = []
     for item in unique_items:
+        owner = item.get("owner") or {}
+        license_info = item.get("license") or {}
+        topics = item.get("topics") or []
         text = f"""
 Repository: "{item['name']}"
 Description: {item['description'] or '暂无描述'}
 Language: {item['language'] or '多种语言'}, Stars: {item['stargazers_count']}
-Owner: {item['owner']['login']}
+Owner: {owner.get('login', '')}
+Owner Avatar: {owner.get('avatar_url', '')}
 Link: {item['html_url']}
+Forks: {item.get('forks_count', 0)}
+Topics: {', '.join(topics) if topics else '无'}
+Last Push: {item.get('pushed_at', '')}
+License: {license_info.get('spdx_id') or license_info.get('name') or ''}
 """
         raw_texts.append(text.strip())
     
@@ -347,7 +448,7 @@ def process_with_llm(raw_text: str) -> Optional[dict]:
 
 要求：
 1. name: 产品英文名称
-2. logo: 使用 Google Favicon API 格式，如 https://www.google.com/s2/favicons?domain=官网域名&sz=128
+2. logo: 非GitHub项目使用 Google Favicon API 格式，如 https://www.google.com/s2/favicons?domain=官网域名&sz=128；GitHub项目会由程序覆盖为 owner_avatar_url
 3. url: 产品官网链接
 4. type: "Agent" 或 "Tool"
 5. tag: Agent类可选(自治智能体/开发智能体/金融智能体/Agent框架)；Tool类可选(AI写作/AI绘画/AI视频/AI音频/音乐/AI办公/开发工具/效率工具)
@@ -387,7 +488,7 @@ def process_with_llm(raw_text: str) -> Optional[dict]:
         
         if start_idx != -1 and end_idx != -1:
             pure_json_str = result_text[start_idx:end_idx+1]
-            return json.loads(pure_json_str)
+            return normalize_structured_data(json.loads(pure_json_str), raw_text)
         else:
             print("❌ 清洗后没有找到合法的 JSON 格式")
             return None
